@@ -113,53 +113,82 @@ produt_batata$Colheita <- factor(produt_batata$Colheita, levels = c(120,150,180)
 
 # Análise descritiva ----------------------------------------------------
 
+graficos <- list()
 
 # Colheita de 120 dias
-ggplot(data = batata120, mapping = aes(x = Gen, y = Produtividade)) +
-  geom_boxplot() +
-  scale_x_discrete(limits = as.character(1:18)) +
-  theme_light() +
-  labs(x = 'Genótipo', y = "Produtividade Total",
-       title = "Produtividade dos genótipos colhidos em 120 dias")
-
+(graficos[[1]] <- ggplot(data = batata120, mapping = aes(x = Gen, y = Produtividade)) +
+        geom_boxplot() +
+        scale_x_discrete(limits = as.character(1:18)) +
+        theme_light() +
+        labs(x = 'Genótipo', y = "Produtividade Total",
+             title = "Produtividade dos genótipos colhidos em 120 dias") )
 
 # Colheita de 150 dias
-ggplot(data = batata150, mapping = aes(x = Gen, y = Produtividade)) +
-  geom_boxplot() +
-  scale_x_discrete(limits = as.character(1:18)) +
-  theme_light() +
-  labs(x = 'Genótipo', y = "Produtividade Total",
-       title = "Produtividade dos genótipos colhidos em 150 dias")
-
+(graficos[[2]] <- ggplot(data = batata150, mapping = aes(x = Gen, y = Produtividade)) +
+    geom_boxplot() +
+    scale_x_discrete(limits = as.character(1:18)) +
+    theme_light() +
+    labs(x = 'Genótipo', y = "Produtividade Total",
+         title = "Produtividade dos genótipos colhidos em 150 dias"))
 
 # Colheita de 180 dias
-ggplot(data = batata180, mapping = aes(x = Gen, y = Produtividade)) +
-  geom_boxplot() +
-  scale_x_discrete(limits = as.character(1:18)) +
-  theme_light() +
-  labs(x = 'Genótipo', y = "Produtividade Total",
-       title = "Produtividade dos genótipos colhidos em 180 dias")
-       
+(graficos[[3]] <- ggplot(data = batata180, mapping = aes(x = Gen, y = Produtividade)) +
+    geom_boxplot() +
+    scale_x_discrete(limits = as.character(1:18)) +
+    theme_light() +
+    labs(x = 'Genótipo', y = "Produtividade Total",
+         title = "Produtividade dos genótipos colhidos em 180 dias")
+)
+
+
 # Produtividade das três colheitas
-ggplot(data = produt_batata, mapping = aes(x = Colheita, y = Produtividade)) + 
-  geom_boxplot()
+(graficos[[4]] <- ggplot(data = produt_batata, mapping = aes(x = Gen, y = Produtividade)) + 
+    geom_boxplot() + facet_grid(rows = vars(Colheita)) +
+    scale_x_discrete(limits = as.character(1:18)) +
+    theme_light() +
+    labs(x = 'Genótipo', y = "Produtividade Total",
+         title = "Produtividade total dos genótipos colhidos em 120, 150 e 180 dias")
+)
 
 # Peso Comercial das três colheitas
-ggplot(data = produt_batata, mapping = aes(x = Colheita, y = peso_Comerc)) + 
-  geom_boxplot()
+(graficos[[5]] <- ggplot(data = produt_batata, mapping = aes(x = Gen, y = peso_Comerc)) + 
+    geom_boxplot() + facet_grid(rows = vars(Colheita)) +
+    scale_x_discrete(limits = as.character(1:18)) +
+    theme_light() +
+    labs(x = 'Genótipo', y = "Peso Comercial",
+         title = "Peso Comercial dos genótipos colhidos em 120, 150 e 180 dias")
+)
 
 # Comprimento Médio das três colheitas
-ggplot(data = produt_batata, mapping = aes(x = Colheita, y = Comp_Medio)) + 
-  geom_boxplot()
+(graficos[[6]] <- ggplot(data = produt_batata, mapping = aes(x = Gen, y = Comp_Medio)) + 
+    geom_boxplot() + facet_grid(rows = vars(Colheita)) +
+    scale_x_discrete(limits = as.character(1:18)) +
+    theme_light() +
+    labs(x = 'Genótipo', y = "Comprimento Médio",
+         title = "Comprimento Médio dos genótipos colhidos em 120, 150 e 180 dias"))
 
 # Diâmetro das três colheitas
-ggplot(data = produt_batata, mapping = aes(x = Colheita, y = Diam_Medio)) + 
-  geom_boxplot()
+(graficos[[7]] <- ggplot(data = produt_batata, mapping = aes(x = Gen, y = Diam_Medio)) + 
+    geom_boxplot() + facet_grid(rows = vars(Colheita)) +
+    scale_x_discrete(limits = as.character(1:18)) +
+    theme_light() +
+    labs(x = 'Genótipo', y = "Diâmetro Médio",
+         title = "Diâmetro Médio dos genótipos colhidos em 120, 150 e 180 dias")
+)
 
 # n° de furos médio das três colheitas
-ggplot(data = produt_batata, mapping = aes(x = Colheita, y = nFuros_Medio)) + 
-  geom_boxplot()
+(graficos[[8]] <- ggplot(data = produt_batata, mapping = aes(x = Gen, y = nFuros_Medio)) + 
+    geom_boxplot() + facet_grid(rows = vars(Colheita)) +
+    scale_x_discrete(limits = as.character(1:18)) +
+    theme_light() +
+    labs(x = 'Genótipo', y = "N° de Furos Médio",
+         title = "N° de Furos Médio dos genótipos colhidos em 120, 150 e 180 dias")
+)
 
+# exportando os gráficos
+for (i in 1:length(graficos)) {
+  ggsave(filename = paste0("grafico_", i, ".png"), plot = graficos[[i]], width = 6, height = 4)
+}
 
 # ANOVA 120 dias -------------------------------------------------------------------
 
@@ -437,7 +466,7 @@ lmtest::dwtest(Produtividade ~ Gen, data = batata180)
 
 #### As Três Colheitas ####
 
-# COMPRIMENTO MÉDIO -- não passou na normalidade
+# COMPRIMENTO MÉDIO -- não passou na normalidade e independência
 # normalidade dos resíduos
 shapiro.test(residuals(aov_comp))
 # homocedasticidade das variâncias
