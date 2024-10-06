@@ -19,8 +19,6 @@ batata120 <- read_xlsx(path = "Input/Dados pós colheita- campo.xlsx", sheet = 1
 batata150 <- read_xlsx(path = "Input/Dados pós colheita- campo.xlsx", sheet = 2)
 batata180 <- read_xlsx(path = "Input/Dados pós colheita- campo.xlsx", sheet = 3)
 
-# importação dos dados de avaliação sensorial
-
 
 # Processamento dos dados ----------------------------------------------------------
 
@@ -104,6 +102,14 @@ batata180 <- batata180 %>%
          nFuros_Medio = rowMeans(select(., nFuros1:nFuros5), na.rm = TRUE))
 
 
+# criando um data frame único
+produt_batata <- bind_rows(
+  batata120 %>% select(Gen, Parcela, Produtividade, peso_Comerc, Comp_Medio, Diam_Medio, nFuros_Medio) %>% mutate(Colheita = 120),
+  batata150 %>% select(Gen, Parcela, Produtividade, peso_Comerc, Comp_Medio, Diam_Medio, nFuros_Medio) %>% mutate(Colheita = 150),
+  batata180 %>% select(Gen, Parcela, Produtividade, peso_Comerc, Comp_Medio, Diam_Medio, nFuros_Medio) %>% mutate(Colheita = 180)
+  )
+produt_batata$Colheita <- factor(produt_batata$Colheita, levels = c(120,150,180))
+
 
 # Análise descritiva ----------------------------------------------------
 
@@ -134,6 +140,25 @@ ggplot(data = batata180, mapping = aes(x = Gen, y = Produtividade)) +
   labs(x = 'Genótipo', y = "Produtividade Total",
        title = "Produtividade dos genótipos colhidos em 180 dias")
        
+# Produtividade das três colheitas
+ggplot(data = produt_batata, mapping = aes(x = Colheita, y = Produtividade)) + 
+  geom_boxplot()
+
+# Peso Comercial das três colheitas
+ggplot(data = produt_batata, mapping = aes(x = Colheita, y = peso_Comerc)) + 
+  geom_boxplot()
+
+# Comprimento Médio das três colheitas
+ggplot(data = produt_batata, mapping = aes(x = Colheita, y = Comp_Medio)) + 
+  geom_boxplot()
+
+# Diâmetro das três colheitas
+ggplot(data = produt_batata, mapping = aes(x = Colheita, y = Diam_Medio)) + 
+  geom_boxplot()
+
+# n° de furos médio das três colheitas
+ggplot(data = produt_batata, mapping = aes(x = Colheita, y = nFuros_Medio)) + 
+  geom_boxplot()
 
 
 # ANOVA 120 dias -------------------------------------------------------------------
@@ -240,6 +265,41 @@ capture.output(summary_aov180, file = "teste_F_nFuros_180.txt")
 aov_pesoCom_180 <- aov(formula = peso_Comerc ~ Parcela+Gen, data = batata180)
 (summary_aov180 <- summary(aov_pesoCom_180))
 capture.output(summary_aov180, file = "teste_F_pesoCom_180.txt")
+
+
+
+
+# ANOVA 2 fatores ---------------------------------------------------------
+
+# ANOVA da Produtividade de Colheita em função dos Genótipos e Colheita
+aov_prod <- aov(formula = Produtividade ~ Parcela+Gen*Colheita, data = produt_batata)
+(summary_aov <- summary(aov_prod))
+# Exportando para um arquivo .txt
+capture.output(summary_aov, file = "teste_F_prod.txt")
+
+
+# ANOVA do Comprimento 
+aov_comp <- aov(formula = Comp_Medio ~ Parcela+Gen*Colheita, data = produt_batata)
+(summary_aov <- summary(aov_comp))
+capture.output(summary_aov, file = "teste_F_comp.txt")
+
+
+# ANOVA do Diâmetro
+aov_diam <- aov(formula = Diam_Medio ~ Parcela+Gen*Colheita, data = produt_batata)
+(summary_aov <- summary(aov_diam))
+capture.output(summary_aov, file = "teste_F_diam.txt")
+
+
+# ANOVA do n° de furos
+aov_furos <- aov(formula = nFuros_Medio ~ Parcela+Gen+Colheita, data = produt_batata)
+(summary_aov <- summary(aov_furos))
+capture.output(summary_aov, file = "teste_F_nFuros.txt")
+
+
+# ANOVA Peso Comercial
+aov_pesoCom <- aov(formula = peso_Comerc ~ Parcela+Gen*Colheita, data = produt_batata)
+(summary_aov <- summary(aov_pesoCom))
+capture.output(summary_aov, file = "teste_F_pesoCom.txt")
 
 
 
@@ -373,6 +433,49 @@ shapiro.test(residuals(aov_prod_180))
 car::leveneTest(Produtividade ~ Gen, data = batata180)
 # independência dos resíduos
 lmtest::dwtest(Produtividade ~ Gen, data = batata180)
+
+
+#### As Três Colheitas ####
+
+# COMPRIMENTO MÉDIO -- não passou na normalidade
+# normalidade dos resíduos
+shapiro.test(residuals(aov_comp))
+# homocedasticidade das variâncias
+car::leveneTest(Comp_Medio ~ Gen, data = produt_batata)
+# independência dos resíduos
+lmtest::dwtest(Comp_Medio ~ Gen, data = produt_batata)
+
+# DIÂMETRO MÉDIO -- não passou na independência
+# normalidade dos resíduos
+shapiro.test(residuals(aov_diam))
+# homocedasticidade das variâncias
+car::leveneTest(Diam_Medio ~ Gen, data = produt_batata)
+# independência dos resíduos
+lmtest::dwtest(Diam_Medio ~ Gen, data = produt_batata)
+
+# N° DE FUROS -- não passou em nada
+# normalidade dos resíduos
+shapiro.test(residuals(aov_furos))
+# homocedasticidade das variâncias
+car::leveneTest(nFuros_Medio ~ Gen, data = produt_batata)
+# independência dos resíduos
+lmtest::dwtest(nFuros_Medio ~ Gen, data = produt_batata)
+
+# PESO COMERCIAL -- não passou em nada
+# normalidade dos resíduos
+shapiro.test(residuals(aov_pesoCom))
+# homocedasticidade das variâncias
+car::leveneTest(peso_Comerc ~ Gen, data = produt_batata)
+# independência dos resíduos
+lmtest::dwtest(peso_Comerc ~ Gen, data = produt_batata)
+
+# PRODUTIVIDADE TOTAL -- não passou em nada
+# normalidade dos resíduos
+shapiro.test(residuals(aov_prod))
+# homocedasticidade das variâncias
+car::leveneTest(Produtividade ~ Gen, data = produt_batata)
+# independência dos resíduos
+lmtest::dwtest(Produtividade ~ Gen, data = produt_batata)
 
 
 # Comparações múltiplas ---------------------------------------------------
