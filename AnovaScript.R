@@ -65,7 +65,7 @@ batata120 <- batata120 %>%
   # criando a variável de produtividade total, comprimento e diâmetro médio
   mutate(Produtividade = ifelse(is.na(peso_Comerc) & is.na(peso_N_Com), NA, 
                                 coalesce(peso_Comerc, 0) + coalesce(peso_N_Com, 0)),
-         Comp_Medio = sqrt(rowMeans(select(., Comp1:Comp5), na.rm = TRUE)+0.05),
+         Comp_Medio = rowMeans(select(., Comp1:Comp5), na.rm = TRUE),
          Diam_Medio = rowMeans(select(., Diam1:Diam5), na.rm = TRUE),
          nFuros_Medio = rowMeans(select(., nFuros1:nFuros5), na.rm = TRUE))
 
@@ -108,7 +108,12 @@ produt_batata <- bind_rows(
   batata150 %>% select(Gen, Parcela, Produtividade, peso_Comerc, Comp_Medio, Diam_Medio, nFuros_Medio) %>% mutate(Colheita = 150),
   batata180 %>% select(Gen, Parcela, Produtividade, peso_Comerc, Comp_Medio, Diam_Medio, nFuros_Medio) %>% mutate(Colheita = 180)
   )
-produt_batata$Colheita <- factor(produt_batata$Colheita, levels = c(120,150,180))
+produt_batata <- produt_batata %>% 
+  mutate(Colheita = factor(Colheita, levels = c(120,150,180)),
+         Produtiv_T = sqrt(Produtividade+0.0001),
+         Peso_Com_T = sqrt(peso_Comerc+0.0001),
+         Comp_T = sqrt(Comp_Medio+0.0001),
+         n_Fur_T = sqrt(nFuros_Medio+0.0001))
 
 
 # Análise descritiva ----------------------------------------------------
@@ -189,6 +194,24 @@ graficos <- list()
 for (i in 1:length(graficos)) {
   ggsave(filename = paste0("grafico_", i, ".png"), plot = graficos[[i]], width = 6, height = 4)
 }
+
+ggplot(data = produt_batata, mapping = aes(x = Gen, y = Produtividade, fill = Parcela)) +
+  geom_col() + facet_grid(rows = vars(Colheita)) +
+  scale_x_discrete(limits = as.character(1:18)) +
+  theme_light() +
+  theme(legend.position = "top") + 
+  labs(x = 'Genótipo', y = "Produtividade Total",
+       title = "Produtividade Total dos genótipos colhidos em 120, 150 e 180 dias")
+
+ggplot(data = produt_batata, mapping = aes(x = Gen, y = Produtividade, colour = Parcela)) + 
+  geom_point() + facet_grid(rows = vars(Colheita)) +
+  scale_x_discrete(limits = as.character(1:18)) +
+  theme_light() +
+  theme(legend.position = "top") + 
+  labs(x = 'Genótipo', y = "Produtividade Total",
+       title = "Produtividade Total dos genótipos colhidos em 120, 150 e 180 dias")
+
+
 
 # ANOVA 120 dias -------------------------------------------------------------------
 
@@ -320,7 +343,7 @@ capture.output(summary_aov, file = "teste_F_diam.txt")
 
 
 # ANOVA do n° de furos
-aov_furos <- aov(formula = nFuros_Medio ~ Parcela+Gen+Colheita, data = produt_batata)
+aov_furos <- aov(formula = nFuros_Medio ~ Parcela+Gen*Colheita, data = produt_batata)
 (summary_aov <- summary(aov_furos))
 capture.output(summary_aov, file = "teste_F_nFuros.txt")
 
@@ -330,6 +353,19 @@ aov_pesoCom <- aov(formula = peso_Comerc ~ Parcela+Gen*Colheita, data = produt_b
 (summary_aov <- summary(aov_pesoCom))
 capture.output(summary_aov, file = "teste_F_pesoCom.txt")
 
+
+# ANOVA Produtividade Transformada
+aov_prod_T <- aov(formula = Produtiv_T ~ Parcela+Gen*Colheita, data = produt_batata)
+(summary_aov <- summary(aov_prod_T))
+
+# ANOVA Peso Comercial Transformada
+aov_pesoCom_T <- aov(formula = Peso_Com_T ~ Parcela+Gen*Colheita, data = produt_batata)
+(summary_aov <- summary(aov_pesoCom_T))
+
+
+# ANOVA DO GENÓTIPO NA COLHEITA?
+aov_prod_Int <- aov(formula = Produtividade ~ Parcela + Colheita/Gen, data = produt_batata)
+summary(aov_prod_Int)
 
 
 # Análise de resíduos -----------------------------------------------------
@@ -466,45 +502,43 @@ lmtest::dwtest(Produtividade ~ Gen, data = batata180)
 
 #### As Três Colheitas ####
 
-# COMPRIMENTO MÉDIO -- não passou na normalidade e independência
+# COMPRIMENTO MÉDIO -- passou em tudo
 # normalidade dos resíduos
 shapiro.test(residuals(aov_comp))
 # homocedasticidade das variâncias
-car::leveneTest(Comp_Medio ~ Gen, data = produt_batata)
-# independência dos resíduos
-lmtest::dwtest(Comp_Medio ~ Gen, data = produt_batata)
+car::leveneTest(Comp_Medio ~ Gen*Colheita, data = produt_batata)
 
-# DIÂMETRO MÉDIO -- não passou na independência
+# DIÂMETRO MÉDIO -- passou em tudo
 # normalidade dos resíduos
 shapiro.test(residuals(aov_diam))
 # homocedasticidade das variâncias
-car::leveneTest(Diam_Medio ~ Gen, data = produt_batata)
-# independência dos resíduos
-lmtest::dwtest(Diam_Medio ~ Gen, data = produt_batata)
+car::leveneTest(Diam_Medio ~ Gen*Colheita, data = produt_batata)
 
-# N° DE FUROS -- não passou em nada
+# N° DE FUROS -- não passou na normalidade
 # normalidade dos resíduos
 shapiro.test(residuals(aov_furos))
 # homocedasticidade das variâncias
-car::leveneTest(nFuros_Medio ~ Gen, data = produt_batata)
-# independência dos resíduos
-lmtest::dwtest(nFuros_Medio ~ Gen, data = produt_batata)
+car::leveneTest(nFuros_Medio ~ Gen*Colheita, data = produt_batata)
 
-# PESO COMERCIAL -- não passou em nada
+# PESO COMERCIAL -- não passou na normalidade
 # normalidade dos resíduos
 shapiro.test(residuals(aov_pesoCom))
 # homocedasticidade das variâncias
-car::leveneTest(peso_Comerc ~ Gen, data = produt_batata)
-# independência dos resíduos
-lmtest::dwtest(peso_Comerc ~ Gen, data = produt_batata)
+car::leveneTest(peso_Comerc ~ Gen*Colheita, data = produt_batata)
 
-# PRODUTIVIDADE TOTAL -- não passou em nada
+# PRODUTIVIDADE TOTAL -- não passou na normalidade
 # normalidade dos resíduos
 shapiro.test(residuals(aov_prod))
 # homocedasticidade das variâncias
-car::leveneTest(Produtividade ~ Gen, data = produt_batata)
-# independência dos resíduos
-lmtest::dwtest(Produtividade ~ Gen, data = produt_batata)
+car::leveneTest(Produtividade ~ Gen*Colheita, data = produt_batata)
+
+# PRODUTIVIDADE TOTAL TRANSFORMADA -- passou em tudo
+shapiro.test(residuals(aov_prod_T))
+car::leveneTest(Produtiv_T ~ Gen*Colheita, data = produt_batata)
+
+# PESO COMERCIAL TRANSFORMADA -- passou em tudo
+shapiro.test(residuals(aov_pesoCom_T))
+car::leveneTest(Peso_Com_T ~ Gen*Colheita, data = produt_batata)
 
 
 # Comparações múltiplas ---------------------------------------------------
@@ -606,3 +640,36 @@ capture.output(scottknott(y = batata180$Produtividade, trt = batata180$Gen,
                           SSerror = sum(aov_prod_180$residuals^2)),
                file = "Scott_Knott_Produt180.txt")
 
+
+#### As três Colheitas ####
+
+# COMPRIMENTO
+capture.output(scottknott(y = produt_batata$Comp_Medio, trt = produt_batata$Gen,
+                          DFerror = aov_comp$df.residual,
+                          SSerror = sum(aov_comp$residuals^2)),
+               file = "Scott_Knott_Comp.txt")
+
+# DIÂMETRO
+capture.output(scottknott(y = produt_batata$Diam_Medio, trt = produt_batata$Gen,
+                          DFerror = aov_diam$df.residual,
+                          SSerror = sum(aov_diam$residuals^2)),
+               file = "Scott_Knott_Diam.txt")
+
+# PESO COMERCIAL
+capture.output(scottknott(y = produt_batata$peso_Comerc, trt = produt_batata$Gen,
+                          DFerror = aov_pesoCom_T$df.residual,
+                          SSerror = sum(aov_pesoCom_T$residuals^2)),
+               file = "Scott_Knott_PesoComT.txt")
+
+# PRODUTIVIDADE TOTAL
+capture.output(scottknott(y = produt_batata$Produtividade, trt = produt_batata$Gen,
+                          DFerror = aov_prod_T$df.residual,
+                          SSerror = sum(aov_prod_T$residuals^2)),
+               file = "Scott_Knott_ProdutivT.txt")
+
+
+# PRODUTIVIDADE TOTAL NA COLHEITA DE 120 DIAS
+scottknott(y = produt_batata$Produtividade[produt_batata$Colheita == "120"],
+           trt = produt_batata$Gen[produt_batata$Colheita == "120"],
+           DFerror = aov_prod_T$df.residual,
+           SSerror = sum(aov_prod_T$residuals^2))
