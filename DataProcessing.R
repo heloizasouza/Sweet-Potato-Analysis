@@ -28,6 +28,8 @@ potato120 <- read_xlsx(path = "Input/Dados pós colheita- campo.xlsx", sheet = 1
 potato150 <- read_xlsx(path = "Input/Dados pós colheita- campo.xlsx", sheet = 2)
 potato180 <- read_xlsx(path = "Input/Dados pós colheita- campo.xlsx", sheet = 3)
 
+# importing climate data
+climate <- read_xlsx(path = "Input/Dados FAL - Estação Climatológica Automática.xlsx", sheet = 1)
 
 # Data Processing ----------------------------------------------------------
 
@@ -124,3 +126,10 @@ produt_potato <- produt_potato %>%
          n_Fur_T = sqrt(nFuros_Medio+0.0001))
 
 
+## treatments in the climate dataset
+climate <- climate %>% 
+  mutate(Data = as.Date(Data, format = "%Y-%m-%d"),
+         across(c(2:7), ~ as.numeric(as.character(.))))
+
+# removing useless lines
+climate <- climate[-c(30:34, 97:99),]
