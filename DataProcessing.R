@@ -10,6 +10,7 @@ rm(list = ls())
 library(readxl)
 # package to data manupulation
 library(dplyr)
+library(tidyr)
 # package to strings manipulation
 library(stringr)
 # package to graphics production 
@@ -30,6 +31,10 @@ potato180 <- read_xlsx(path = "Input/Dados pós colheita- campo.xlsx", sheet = 3
 
 # importing climate data
 climate <- read_xlsx(path = "Input/Dados FAL - Estação Climatológica Automática.xlsx", sheet = 1)
+
+# importing sensory evaluation dataset
+sensorial <- read_xlsx(path = "Input/Avaliação sensorial 150D- copia.xlsx", sheet = 1)
+
 
 # Data Processing ----------------------------------------------------------
 
@@ -133,3 +138,24 @@ climate <- climate %>%
 
 # removing useless lines
 climate <- climate[-c(30:34, 97:99),]
+
+
+# treatments in the sensory evaluation dataset
+sensorial <- sensorial %>%
+  # transforms all 0 into NA
+  mutate(across(c(3:11), ~ replace(., 0, NA)))
+
+# filling in the age and gender of missing forms
+sensorial_filled <- sensorial %>%
+  group_by(Formulário) %>%
+  fill(Idade, Gênero, .direction = "down") %>%
+  fill(Idade, .direction = "up") %>%
+  ungroup() %>% 
+# creating age group variable
+  mutate(faixa_etaria = as.factor(case_when(
+    Idade >= 18 & Idade <= 20 ~ '18-20',
+    Idade > 20 & Idade <= 22 ~ '20-22',
+    Idade > 22 & Idade <= 24 ~ '22-24',
+    Idade >= 25 ~ '25+'
+  )))
+
