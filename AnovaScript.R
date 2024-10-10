@@ -1,675 +1,461 @@
-# análise de dados da batata doce
-
-rm(list = ls())
-
-# Bibliotecas ---------------------------------------------------------------
-
-library(readxl) # para leitura dos dados
-library(dplyr) # para processamento dos dados
-library(stringr) # para tratamento de strings
-library(ggplot2) # para produção gráfica
-library(agricolae) # para executar o teste de Tukey
-library(ExpDes.pt) # para executar o teste de Scott-Knott
+# Analysis of Variance of sewwt potato
+# Heloiza de Oliveira Souza -- October 2024
 
 
-# Carregamento dos dados ------------------------------------------------------------
-
-# importação dos dados de colheita
-batata120 <- read_xlsx(path = "Input/Dados pós colheita- campo.xlsx", sheet = 1)
-batata150 <- read_xlsx(path = "Input/Dados pós colheita- campo.xlsx", sheet = 2)
-batata180 <- read_xlsx(path = "Input/Dados pós colheita- campo.xlsx", sheet = 3)
+# Descriptive Analysis ----------------------------------------------------
 
 
-# Processamento dos dados ----------------------------------------------------------
+source(file = "DescriptiveAnalysis.R")
 
 
-# removendo linhas desnecessárias
-batata120 <- batata120[-c(1,2),]
-batata150 <- batata150[-c(1,2),]
-batata180 <- batata180[-c(1,2),]
-
-# renomeando colunas
-colnames(batata120) <- c('Genotipo', 'Gen', 'Parcela', 'n_Turb_Comerc', 'peso_Comerc',
-                         'n_Turb_N_Com', 'peso_N_Com', 'Produtividade', 'Comp1',
-                         'Comp2', 'Comp3', 'Comp4', 'Comp5', 'Diam1', 'Diam2', 
-                         'Diam3', 'Diam4', 'Diam5', 'Espessura', 'obs', 'nFuros1',
-                         'nFuros2', 'nFuros3', 'nFuros4', 'nFuros5', 'Form_Com1',
-                         'Form_Com2', 'Form_Com3', 'Form_Com4', 'Form_Com5', 'Form_mapa1',
-                         'Form_mapa2', 'Form_mapa3', 'Form_mapa4', 'Form_mapa5', 
-                         'cor_Casca', 'cor_Polpa', 'cor_2Casca', 'cor_2Polpa')
-colnames(batata150) <- c('Genotipo', 'Gen', 'Parcela', 'n_Turb_Comerc', 'peso_Comerc',
-                         'n_Turb_N_Com', 'peso_N_Com', 'Produtividade', 'Comp1',
-                         'Comp2', 'Comp3', 'Comp4', 'Comp5', 'Com_Medio', 'Diam1', 'Diam2', 
-                         'Diam3', 'Diam4', 'Diam5', 'Diam_Medio', 'Espessura', 'obs', 'nFuros1',
-                         'nFuros2', 'nFuros3', 'nFuros4', 'nFuros5', 'n_Furos_Medio', 'Form_mapa1',
-                         'Form_mapa2', 'Form_mapa3', 'Form_mapa4', 'Form_mapa5', 
-                         'cor_Casca', 'cor_Polpa', 'cor_2Casca', 'cor_2Polpa')
-colnames(batata180) <- c('Genotipo', 'Gen', 'Parcela', 'n_Turb_Comerc', 'peso_Comerc',
-                         'n_Turb_N_Com', 'peso_N_Com', 'Produtividade', 'Comp1',
-                         'Comp2', 'Comp3', 'Comp4', 'Comp5', 'Diam1', 'Diam2', 
-                         'Diam3', 'Diam4', 'Diam5', 'Espessura', 'obs', 'nFuros1',
-                         'nFuros2', 'nFuros3', 'nFuros4', 'nFuros5', 'Form_mapa1',
-                         'Form_mapa2', 'Form_mapa3', 'Form_mapa4', 'Form_mapa5', 
-                         'cor_Casca', 'cor_Polpa', 'cor_2Casca', 'cor_2Polpa')
+# ANOVA 120-day -------------------------------------------------------------------
 
 
-# tratamentos no conjunto de dados pós colheita de 120 dias
-batata120 <- batata120 %>%
-  # transforma em NA todos os outros códigos de informação faltante
-  mutate(across(everything(), ~ replace(., . %in% c('-9','-7','****'), NA))) %>%
-  # transforma as colunas numéricas e categóricas
-  mutate(across(c(4:19, 21:25), ~ as.numeric(as.character(.))),
-         across(c(1:3,36:39), ~as.factor(as.character(.)))) %>%
-  # extraindo apenas a parte numérica da nota de avaliação de cor
-  mutate(across(starts_with("cor"), ~ str_extract(., "\\d+") %>% as.numeric() %>% factor()))  %>% 
-  # criando a variável de produtividade total, comprimento e diâmetro médio
-  mutate(Produtividade = ifelse(is.na(peso_Comerc) & is.na(peso_N_Com), NA, 
-                                coalesce(peso_Comerc, 0) + coalesce(peso_N_Com, 0)),
-         Comp_Medio = rowMeans(select(., Comp1:Comp5), na.rm = TRUE),
-         Diam_Medio = rowMeans(select(., Diam1:Diam5), na.rm = TRUE),
-         nFuros_Medio = rowMeans(select(., nFuros1:nFuros5), na.rm = TRUE))
-
-
-# tratamentos no conjunto de dados pós colheita de 150 dias
-batata150 <- batata150 %>%
-  mutate(across(everything(), ~ as.character(.))) %>%
-  # transforma em NA todos os valores -9 encontrados no df
-  mutate(across(everything(), ~ na_if(., '-9'))) %>%
-  # transforma as colunas numéricas e categóricas
-  mutate(across(c(4:21, 23:33), ~ as.numeric(as.character(.))),
-         across(c(1:3,34:37), ~as.factor(as.character(.)))) %>%
-  # criando a variável de produtividade total, comprimento e diâmetro médio
-  mutate(Produtividade = ifelse(is.na(peso_Comerc) & is.na(peso_N_Com), NA, 
-                                coalesce(peso_Comerc, 0) + coalesce(peso_N_Com, 0)),
-         Comp_Medio = rowMeans(select(., Comp1:Comp5), na.rm = TRUE),
-         Diam_Medio = rowMeans(select(., Diam1:Diam5), na.rm = TRUE),
-         nFuros_Medio = rowMeans(select(., nFuros1:nFuros5), na.rm = TRUE))
-
-
-# tratamentos no conjunto de dados pós colheita de 150 dias
-batata180 <- batata180 %>%
-  mutate(across(everything(), ~ as.character(.))) %>%
-  # transforma em NA todos os valores -9 encontrados no df
-  mutate(across(everything(), ~ na_if(., '-9'))) %>%
-  # transforma as colunas numéricas e categóricas
-  mutate(across(c(4:19, 21:30), ~ as.numeric(as.character(.))),
-         across(c(1:3,31:34), ~as.factor(as.character(.)))) %>%
-  # criando a variável de produtividade total, comprimento e diâmetro médio
-  mutate(Produtividade = ifelse(is.na(peso_Comerc) & is.na(peso_N_Com), NA, 
-                                coalesce(peso_Comerc, 0) + coalesce(peso_N_Com, 0)),
-         Comp_Medio = rowMeans(select(., Comp1:Comp5), na.rm = TRUE),
-         Diam_Medio = rowMeans(select(., Diam1:Diam5), na.rm = TRUE),
-         nFuros_Medio = rowMeans(select(., nFuros1:nFuros5), na.rm = TRUE))
-
-
-# criando um data frame único
-produt_batata <- bind_rows(
-  batata120 %>% select(Gen, Parcela, Produtividade, peso_Comerc, Comp_Medio, Diam_Medio, nFuros_Medio) %>% mutate(Colheita = 120),
-  batata150 %>% select(Gen, Parcela, Produtividade, peso_Comerc, Comp_Medio, Diam_Medio, nFuros_Medio) %>% mutate(Colheita = 150),
-  batata180 %>% select(Gen, Parcela, Produtividade, peso_Comerc, Comp_Medio, Diam_Medio, nFuros_Medio) %>% mutate(Colheita = 180)
-  )
-produt_batata <- produt_batata %>% 
-  mutate(Colheita = factor(Colheita, levels = c(120,150,180)),
-         Produtiv_T = sqrt(Produtividade+0.0001),
-         Peso_Com_T = sqrt(peso_Comerc+0.0001),
-         Comp_T = sqrt(Comp_Medio+0.0001),
-         n_Fur_T = sqrt(nFuros_Medio+0.0001))
-
-
-# Análise descritiva ----------------------------------------------------
-
-graficos <- list()
-
-# Colheita de 120 dias
-(graficos[[1]] <- ggplot(data = batata120, mapping = aes(x = Gen, y = Produtividade)) +
-        geom_boxplot() +
-        scale_x_discrete(limits = as.character(1:18)) +
-        theme_light() +
-        labs(x = 'Genótipo', y = "Produtividade Total",
-             title = "Produtividade dos genótipos colhidos em 120 dias") )
-
-# Colheita de 150 dias
-(graficos[[2]] <- ggplot(data = batata150, mapping = aes(x = Gen, y = Produtividade)) +
-    geom_boxplot() +
-    scale_x_discrete(limits = as.character(1:18)) +
-    theme_light() +
-    labs(x = 'Genótipo', y = "Produtividade Total",
-         title = "Produtividade dos genótipos colhidos em 150 dias"))
-
-# Colheita de 180 dias
-(graficos[[3]] <- ggplot(data = batata180, mapping = aes(x = Gen, y = Produtividade)) +
-    geom_boxplot() +
-    scale_x_discrete(limits = as.character(1:18)) +
-    theme_light() +
-    labs(x = 'Genótipo', y = "Produtividade Total",
-         title = "Produtividade dos genótipos colhidos em 180 dias")
-)
-
-
-# Produtividade das três colheitas
-(graficos[[4]] <- ggplot(data = produt_batata, mapping = aes(x = Gen, y = Produtividade)) + 
-    geom_boxplot() + facet_grid(rows = vars(Colheita)) +
-    scale_x_discrete(limits = as.character(1:18)) +
-    theme_light() +
-    labs(x = 'Genótipo', y = "Produtividade Total",
-         title = "Produtividade total dos genótipos colhidos em 120, 150 e 180 dias")
-)
-
-# Peso Comercial das três colheitas
-(graficos[[5]] <- ggplot(data = produt_batata, mapping = aes(x = Gen, y = peso_Comerc)) + 
-    geom_boxplot() + facet_grid(rows = vars(Colheita)) +
-    scale_x_discrete(limits = as.character(1:18)) +
-    theme_light() +
-    labs(x = 'Genótipo', y = "Peso Comercial",
-         title = "Peso Comercial dos genótipos colhidos em 120, 150 e 180 dias")
-)
-
-# Comprimento Médio das três colheitas
-(graficos[[6]] <- ggplot(data = produt_batata, mapping = aes(x = Gen, y = Comp_Medio)) + 
-    geom_boxplot() + facet_grid(rows = vars(Colheita)) +
-    scale_x_discrete(limits = as.character(1:18)) +
-    theme_light() +
-    labs(x = 'Genótipo', y = "Comprimento Médio",
-         title = "Comprimento Médio dos genótipos colhidos em 120, 150 e 180 dias"))
-
-# Diâmetro das três colheitas
-(graficos[[7]] <- ggplot(data = produt_batata, mapping = aes(x = Gen, y = Diam_Medio)) + 
-    geom_boxplot() + facet_grid(rows = vars(Colheita)) +
-    scale_x_discrete(limits = as.character(1:18)) +
-    theme_light() +
-    labs(x = 'Genótipo', y = "Diâmetro Médio",
-         title = "Diâmetro Médio dos genótipos colhidos em 120, 150 e 180 dias")
-)
-
-# n° de furos médio das três colheitas
-(graficos[[8]] <- ggplot(data = produt_batata, mapping = aes(x = Gen, y = nFuros_Medio)) + 
-    geom_boxplot() + facet_grid(rows = vars(Colheita)) +
-    scale_x_discrete(limits = as.character(1:18)) +
-    theme_light() +
-    labs(x = 'Genótipo', y = "N° de Furos Médio",
-         title = "N° de Furos Médio dos genótipos colhidos em 120, 150 e 180 dias")
-)
-
-# exportando os gráficos
-for (i in 1:length(graficos)) {
-  ggsave(filename = paste0("grafico_", i, ".png"), plot = graficos[[i]], width = 6, height = 4)
-}
-
-ggplot(data = produt_batata, mapping = aes(x = Gen, y = Produtividade, fill = Parcela)) +
-  geom_col() + facet_grid(rows = vars(Colheita)) +
-  scale_x_discrete(limits = as.character(1:18)) +
-  theme_light() +
-  theme(legend.position = "top") + 
-  labs(x = 'Genótipo', y = "Produtividade Total",
-       title = "Produtividade Total dos genótipos colhidos em 120, 150 e 180 dias")
-
-ggplot(data = produt_batata, mapping = aes(x = Gen, y = Produtividade, colour = Parcela)) + 
-  geom_point() + facet_grid(rows = vars(Colheita)) +
-  scale_x_discrete(limits = as.character(1:18)) +
-  theme_light() +
-  theme(legend.position = "top") + 
-  labs(x = 'Genótipo', y = "Produtividade Total",
-       title = "Produtividade Total dos genótipos colhidos em 120, 150 e 180 dias")
-
-
-
-# ANOVA 120 dias -------------------------------------------------------------------
-
-
-# ANOVA da Produtividade de Colheita em função dos Genótipos
-aov_prod_120 <- aov(formula = Produtividade ~ Parcela+Gen, data = batata120)
+# ANOVA of Harvest Productivity as a Function of Genotypes
+aov_prod_120 <- aov(formula = Produtividade ~ Parcela+Gen, data = potato120)
 (summary_aov120 <- summary(aov_prod_120))
-# Exportando para um arquivo .txt
+# Exporting to a .txt file
 capture.output(summary_aov120, file = "teste_F_prod_120.txt")
 
 
-# ANOVA do Comprimento 
-aov_comp_120 <- aov(formula = Comp_Medio ~ Parcela+Gen, data = batata120)
+# Average Length ANOVA
+aov_comp_120 <- aov(formula = Comp_Medio ~ Parcela+Gen, data = potato120)
 (summary_aov120 <- summary(aov_comp_120))
 capture.output(summary_aov120, file = "teste_F_comp_120.txt")
 
 
-# ANOVA do Diâmetro
-aov_diam_120 <- aov(formula = Diam_Medio ~ Parcela+Gen, data = batata120)
+# Average Diameter ANOVA
+aov_diam_120 <- aov(formula = Diam_Medio ~ Parcela+Gen, data = potato120)
 (summary_aov120 <- summary(aov_diam_120))
 capture.output(summary_aov120, file = "teste_F_diam_120.txt")
 
 
-# ANOVA do n° de furos
-aov_furos_120 <- aov(formula = nFuros_Medio ~ Parcela+Gen, data = batata120)
+# Number os Holls ANOVA
+aov_furos_120 <- aov(formula = nFuros_Medio ~ Parcela+Gen, data = potato120)
 (summary_aov120 <- summary(aov_furos_120))
 capture.output(summary_aov120, file = "teste_F_nFuros_120.txt")
 
 
-# ANOVA Peso Comercial
-aov_pesoCom_120 <- aov(formula = peso_Comerc ~ Parcela+Gen, data = batata120)
+# Comercial Weight ANOVA
+aov_pesoCom_120 <- aov(formula = peso_Comerc ~ Parcela+Gen, data = potato120)
 (summary_aov120 <- summary(aov_pesoCom_120))
 capture.output(summary_aov120, file = "teste_F_pesoCom_120.txt")
 
 
 
 
-# ANOVA 150 dias --------------------------------------------
+# ANOVA 150-day --------------------------------------------
 
 
-# ANOVA da Produtividade de Colheita em função dos Genótipos
-aov_prod_150 <- aov(formula = Produtividade ~ Parcela+Gen, data = batata150)
+# ANOVA of Harvest Productivity as a Function of Genotypes
+aov_prod_150 <- aov(formula = Produtividade ~ Parcela+Gen, data = potato150)
 (summary_aov150 <- summary(aov_prod_150))
-# Exportando para um arquivo .txt
+# Exporting to a .txt file
 capture.output(summary_aov150, file = "teste_F_prod_150.txt")
 
 
-# ANOVA do Comprimento 
-aov_comp_150 <- aov(formula = Comp_Medio ~ Parcela+Gen, data = batata150)
+# Average Length ANOVA
+aov_comp_150 <- aov(formula = Comp_Medio ~ Parcela+Gen, data = potato150)
 (summary_aov150 <- summary(aov_comp_150))
 capture.output(summary_aov150, file = "teste_F_comp_150.txt")
 
 
-# ANOVA do Diâmetro
-aov_diam_150 <- aov(formula = Diam_Medio ~ Parcela+Gen, data = batata150)
+# Average Diameter ANOVA
+aov_diam_150 <- aov(formula = Diam_Medio ~ Parcela+Gen, data = potato150)
 (summary_aov150 <- summary(aov_diam_150))
 capture.output(summary_aov150, file = "teste_F_diam_150.txt")
 
 
-# ANOVA do n° de furos
-aov_furos_150 <- aov(formula = nFuros_Medio ~ Parcela+Gen, data = batata150)
+# Number os Holls ANOVA
+aov_furos_150 <- aov(formula = nFuros_Medio ~ Parcela+Gen, data = potato150)
 (summary_aov150 <- summary(aov_furos_150))
 capture.output(summary_aov150, file = "teste_F_nFuros_150.txt")
 
 
-# ANOVA Peso Comercial
-aov_pesoCom_150 <- aov(formula = peso_Comerc ~ Parcela+Gen, data = batata150)
+# Comercial Weight ANOVA
+aov_pesoCom_150 <- aov(formula = peso_Comerc ~ Parcela+Gen, data = potato150)
 (summary_aov150 <- summary(aov_pesoCom_150))
 capture.output(summary_aov150, file = "teste_F_pesoCom_150.txt")
 
 
 
 
-# ANOVA 180 dias ----------------------------------------------------------
+# ANOVA 180-day ----------------------------------------------------------
 
 
-# ANOVA da Produtividade de Colheita em função dos Genótipos
-aov_prod_180 <- aov(formula = Produtividade ~ Parcela+Gen, data = batata180)
+# ANOVA of Harvest Productivity as a Function of Genotypes
+aov_prod_180 <- aov(formula = Produtividade ~ Parcela+Gen, data = potato180)
 (summary_aov180 <- summary(aov_prod_180))
-# Exportando para um arquivo .txt
+# Exporting to a .txt file
 capture.output(summary_aov180, file = "teste_F_prod_180.txt")
 
 
-# ANOVA do Comprimento 
-aov_comp_180 <- aov(formula = Comp_Medio ~ Parcela+Gen, data = batata180)
+# Average Length ANOVA
+aov_comp_180 <- aov(formula = Comp_Medio ~ Parcela+Gen, data = potato180)
 (summary_aov180 <- summary(aov_comp_180))
 capture.output(summary_aov180, file = "teste_F_comp_180.txt")
 
 
-# ANOVA do Diâmetro
-aov_diam_180 <- aov(formula = Diam_Medio ~ Parcela+Gen, data = batata180)
+# Average Diameter ANOVA
+aov_diam_180 <- aov(formula = Diam_Medio ~ Parcela+Gen, data = potato180)
 (summary_aov180 <- summary(aov_diam_180))
 capture.output(summary_aov180, file = "teste_F_diam_180.txt")
 
 
-# ANOVA do n° de furos
-aov_furos_180 <- aov(formula = nFuros_Medio ~ Parcela+Gen, data = batata180)
+# Number os Holls ANOVA
+aov_furos_180 <- aov(formula = nFuros_Medio ~ Parcela+Gen, data = potato180)
 (summary_aov180 <- summary(aov_furos_180))
 capture.output(summary_aov180, file = "teste_F_nFuros_180.txt")
 
 
-# ANOVA Peso Comercial
-aov_pesoCom_180 <- aov(formula = peso_Comerc ~ Parcela+Gen, data = batata180)
+# Comercial Weight ANOVA
+aov_pesoCom_180 <- aov(formula = peso_Comerc ~ Parcela+Gen, data = potato180)
 (summary_aov180 <- summary(aov_pesoCom_180))
 capture.output(summary_aov180, file = "teste_F_pesoCom_180.txt")
 
 
 
 
-# ANOVA 2 fatores ---------------------------------------------------------
+# Two-Way ANOVA ---------------------------------------------------------
 
-# ANOVA da Produtividade de Colheita em função dos Genótipos e Colheita
-aov_prod <- aov(formula = Produtividade ~ Parcela+Gen*Colheita, data = produt_batata)
+# ANOVA of Harvest Productivity as a Function of Genotypes e Colheita
+aov_prod <- aov(formula = Produtividade ~ Parcela+Gen*Colheita, data = produt_potato)
 (summary_aov <- summary(aov_prod))
-# Exportando para um arquivo .txt
+# Exporting to a .txt file
 capture.output(summary_aov, file = "teste_F_prod.txt")
 
 
-# ANOVA do Comprimento 
-aov_comp <- aov(formula = Comp_Medio ~ Parcela+Gen*Colheita, data = produt_batata)
+# Average Length ANOVA
+aov_comp <- aov(formula = Comp_Medio ~ Parcela+Gen*Colheita, data = produt_potato)
 (summary_aov <- summary(aov_comp))
 capture.output(summary_aov, file = "teste_F_comp.txt")
 
 
-# ANOVA do Diâmetro
-aov_diam <- aov(formula = Diam_Medio ~ Parcela+Gen*Colheita, data = produt_batata)
+# Average Diameter ANOVA
+aov_diam <- aov(formula = Diam_Medio ~ Parcela+Gen*Colheita, data = produt_potato)
 (summary_aov <- summary(aov_diam))
 capture.output(summary_aov, file = "teste_F_diam.txt")
 
 
-# ANOVA do n° de furos
-aov_furos <- aov(formula = nFuros_Medio ~ Parcela+Gen*Colheita, data = produt_batata)
+# Number os Holls ANOVA
+aov_furos <- aov(formula = nFuros_Medio ~ Parcela+Gen*Colheita, data = produt_potato)
 (summary_aov <- summary(aov_furos))
 capture.output(summary_aov, file = "teste_F_nFuros.txt")
 
 
-# ANOVA Peso Comercial
-aov_pesoCom <- aov(formula = peso_Comerc ~ Parcela+Gen*Colheita, data = produt_batata)
+# Comercial Weight ANOVA
+aov_pesoCom <- aov(formula = peso_Comerc ~ Parcela+Gen*Colheita, data = produt_potato)
 (summary_aov <- summary(aov_pesoCom))
 capture.output(summary_aov, file = "teste_F_pesoCom.txt")
 
 
-# ANOVA Produtividade Transformada
-aov_prod_T <- aov(formula = Produtiv_T ~ Parcela+Gen*Colheita, data = produt_batata)
+# Transformed Productivity ANOVA
+aov_prod_T <- aov(formula = Produtiv_T ~ Parcela+Gen*Colheita, data = produt_potato)
 (summary_aov <- summary(aov_prod_T))
 
-# ANOVA Peso Comercial Transformada
-aov_pesoCom_T <- aov(formula = Peso_Com_T ~ Parcela+Gen*Colheita, data = produt_batata)
+# Transformed Comercial Weight ANOVA
+aov_pesoCom_T <- aov(formula = Peso_Com_T ~ Parcela+Gen*Colheita, data = produt_potato)
 (summary_aov <- summary(aov_pesoCom_T))
 
 
 # ANOVA DO GENÓTIPO NA COLHEITA?
-aov_prod_Int <- aov(formula = Produtividade ~ Parcela + Colheita/Gen, data = produt_batata)
+aov_prod_Int <- aov(formula = Produtividade ~ Parcela + Colheita/Gen, data = produt_potato)
 summary(aov_prod_Int)
 
 
-# Análise de resíduos -----------------------------------------------------
 
 
-#### Colheita de 120 dias ####
+# Residuals Analysis -----------------------------------------------------
 
-# COMPRIMENTO MÉDIO -- passou na normalidade com transformação
-# normalidade dos resíduos
+
+#### 120-day Harvest ####
+
+# AVERAGE LENGTH -- passou na normalidade com transformação
+# normality of residuals
 shapiro.test(residuals(aov_comp_120))
-# homocedasticidade das variâncias
-car::leveneTest(Comp_Medio ~ Gen, data = batata120)
-# independência dos resíduos
-lmtest::dwtest(Comp_Medio ~ Gen, data = batata120)
+# homoscedasticity of variances
+car::leveneTest(Comp_Medio ~ Gen, data = potato120)
+# residuals independence
+lmtest::dwtest(Comp_Medio ~ Gen, data = potato120)
 
-# DIÂMETRO MÉDIO -- passou
-# normalidade dos resíduos
+# AVERAGE DIAMETER -- passou
+# normality of residuals
 shapiro.test(residuals(aov_diam_120))
-# homocedasticidade das variâncias
-car::leveneTest(Diam_Medio ~ Gen, data = batata120)
-# independência dos resíduos
-lmtest::dwtest(Diam_Medio ~ Gen, data = batata120)
+# homoscedasticity of variances
+car::leveneTest(Diam_Medio ~ Gen, data = potato120)
+# residuals independence
+lmtest::dwtest(Diam_Medio ~ Gen, data = potato120)
 
-# N° DE FUROS -- não passou na normalidade
-# normalidade dos resíduos
+# NUMBER OF HOLLS -- não passou na normalidade
+# normality of residuals
 shapiro.test(residuals(aov_furos_120))
-# homocedasticidade das variâncias
-car::leveneTest(nFuros_Medio ~ Gen, data = batata120)
-# independência dos resíduos
-lmtest::dwtest(nFuros_Medio ~ Gen, data = batata120)
+# homoscedasticity of variances
+car::leveneTest(nFuros_Medio ~ Gen, data = potato120)
+# residuals independence
+lmtest::dwtest(nFuros_Medio ~ Gen, data = potato120)
 
-# PESO COMERCIAL -- passou
-# normalidade dos resíduos
+# COMERCIAL WEIGTH -- passou
+# normality of residuals
 shapiro.test(residuals(aov_pesoCom_120))
-# homocedasticidade das variâncias
-car::leveneTest(peso_Comerc ~ Gen, data = batata120)
-# independência dos resíduos
-lmtest::dwtest(peso_Comerc ~ Gen, data = batata120)
+# homoscedasticity of variances
+car::leveneTest(peso_Comerc ~ Gen, data = potato120)
+# residuals independence
+lmtest::dwtest(peso_Comerc ~ Gen, data = potato120)
 
-# PRODUTIVIDADE TOTAL -- passou
-# normalidade dos resíduos
+# TOTAL PRODUCTIVITY -- passou
+# normality of residuals
 shapiro.test(residuals(aov_prod_120))
-# homocedasticidade das variâncias
-car::leveneTest(Produtividade ~ Gen, data = batata120)
-# independência dos resíduos
-lmtest::dwtest(Produtividade ~ Gen, data = batata120)
+# homoscedasticity of variances
+car::leveneTest(Produtividade ~ Gen, data = potato120)
+# residuals independence
+lmtest::dwtest(Produtividade ~ Gen, data = potato120)
 
 
-#### Colheita de 150 dias ####
+#### 150-day Harvest ####
 
-# COMPRIMENTO MÉDIO -- passou
-# normalidade dos resíduos
+# AVERAGE LENGTH -- passou
+# normality of residuals
 shapiro.test(residuals(aov_comp_150))
-# homocedasticidade das variâncias
-car::leveneTest(Comp_Medio ~ Gen, data = batata150)
-# independência dos resíduos
-lmtest::dwtest(Comp_Medio ~ Gen, data = batata150)
+# homoscedasticity of variances
+car::leveneTest(Comp_Medio ~ Gen, data = potato150)
+# residuals independence
+lmtest::dwtest(Comp_Medio ~ Gen, data = potato150)
 
-# DIÂMETRO MÉDIO -- passou
-# normalidade dos resíduos
+# AVERAGE DIAMETER -- passou
+# normality of residuals
 shapiro.test(residuals(aov_diam_150))
-# homocedasticidade das variâncias
-car::leveneTest(Diam_Medio ~ Gen, data = batata150)
-# independência dos resíduos
-lmtest::dwtest(Diam_Medio ~ Gen, data = batata150)
+# homoscedasticity of variances
+car::leveneTest(Diam_Medio ~ Gen, data = potato150)
+# residuals independence
+lmtest::dwtest(Diam_Medio ~ Gen, data = potato150)
 
-# N° DE FUROS -- não passou na normalidade
-# normalidade dos resíduos
+# NUMBER OF HOLLS -- não passou na normalidade
+# normality of residuals
 shapiro.test(residuals(aov_furos_150))
-# homocedasticidade das variâncias
-car::leveneTest(nFuros_Medio ~ Gen, data = batata150)
-# independência dos resíduos
-lmtest::dwtest(nFuros_Medio ~ Gen, data = batata150)
+# homoscedasticity of variances
+car::leveneTest(nFuros_Medio ~ Gen, data = potato150)
+# residuals independence
+lmtest::dwtest(nFuros_Medio ~ Gen, data = potato150)
 
-# PESO COMERCIAL -- passou
-# normalidade dos resíduos
+# COMERCIAL WEIGTH -- passou
+# normality of residuals
 shapiro.test(residuals(aov_pesoCom_150))
-# homocedasticidade das variâncias
-car::leveneTest(peso_Comerc ~ Gen, data = batata150)
-# independência dos resíduos
-lmtest::dwtest(peso_Comerc ~ Gen, data = batata150)
+# homoscedasticity of variances
+car::leveneTest(peso_Comerc ~ Gen, data = potato150)
+# residuals independence
+lmtest::dwtest(peso_Comerc ~ Gen, data = potato150)
 
-# PRODUTIVIDADE TOTAL -- passou
-# normalidade dos resíduos
+# TOTAL PRODUCTIVITY -- passou
+# normality of residuals
 shapiro.test(residuals(aov_prod_150))
-# homocedasticidade das variâncias
-car::leveneTest(Produtividade ~ Gen, data = batata150)
-# independência dos resíduos
-lmtest::dwtest(Produtividade ~ Gen, data = batata150)
+# homoscedasticity of variances
+car::leveneTest(Produtividade ~ Gen, data = potato150)
+# residuals independence
+lmtest::dwtest(Produtividade ~ Gen, data = potato150)
 
 
-#### Colheita de 180 dias ####
+#### 180-day Harvest ####
 
-# COMPRIMENTO MÉDIO -- passou
-# normalidade dos resíduos
+# AVERAGE LENGTH -- passou
+# normality of residuals
 shapiro.test(residuals(aov_comp_180))
-# homocedasticidade das variâncias
-car::leveneTest(Comp_Medio ~ Gen, data = batata180)
-# independência dos resíduos
-lmtest::dwtest(Comp_Medio ~ Gen, data = batata180)
+# homoscedasticity of variances
+car::leveneTest(Comp_Medio ~ Gen, data = potato180)
+# residuals independence
+lmtest::dwtest(Comp_Medio ~ Gen, data = potato180)
 
-# DIÂMETRO MÉDIO -- passou
-# normalidade dos resíduos
+# AVERAGE DIAMETER -- passou
+# normality of residuals
 shapiro.test(residuals(aov_diam_180))
-# homocedasticidade das variâncias
-car::leveneTest(Diam_Medio ~ Gen, data = batata180)
-# independência dos resíduos
-lmtest::dwtest(Diam_Medio ~ Gen, data = batata180)
+# homoscedasticity of variances
+car::leveneTest(Diam_Medio ~ Gen, data = potato180)
+# residuals independence
+lmtest::dwtest(Diam_Medio ~ Gen, data = potato180)
 
-# N° DE FUROS -- não passou na normalidade
-# normalidade dos resíduos
+# NUMBER OF HOLLS -- não passou na normalidade
+# normality of residuals
 shapiro.test(residuals(aov_furos_180))
-# homocedasticidade das variâncias
-car::leveneTest(nFuros_Medio ~ Gen, data = batata180)
-# independência dos resíduos
-lmtest::dwtest(nFuros_Medio ~ Gen, data = batata180)
+# homoscedasticity of variances
+car::leveneTest(nFuros_Medio ~ Gen, data = potato180)
+# residuals independence
+lmtest::dwtest(nFuros_Medio ~ Gen, data = potato180)
 
-# PESO COMERCIAL -- passou
-# normalidade dos resíduos
+# COMERCIAL WEIGTH -- passou
+# normality of residuals
 shapiro.test(residuals(aov_pesoCom_180))
-# homocedasticidade das variâncias
-car::leveneTest(peso_Comerc ~ Gen, data = batata180)
-# independência dos resíduos
-lmtest::dwtest(peso_Comerc ~ Gen, data = batata180)
+# homoscedasticity of variances
+car::leveneTest(peso_Comerc ~ Gen, data = potato180)
+# residuals independence
+lmtest::dwtest(peso_Comerc ~ Gen, data = potato180)
 
-# PRODUTIVIDADE TOTAL -- passou
-# normalidade dos resíduos
+# TOTAL PRODUCTIVITY -- passou
+# normality of residuals
 shapiro.test(residuals(aov_prod_180))
-# homocedasticidade das variâncias
-car::leveneTest(Produtividade ~ Gen, data = batata180)
-# independência dos resíduos
-lmtest::dwtest(Produtividade ~ Gen, data = batata180)
+# homoscedasticity of variances
+car::leveneTest(Produtividade ~ Gen, data = potato180)
+# residuals independence
+lmtest::dwtest(Produtividade ~ Gen, data = potato180)
 
 
-#### As Três Colheitas ####
+#### The Three Harvests ####
 
-# COMPRIMENTO MÉDIO -- passou em tudo
-# normalidade dos resíduos
+# AVERAGE LENGTH -- passou em tudo
+# normality of residuals
 shapiro.test(residuals(aov_comp))
-# homocedasticidade das variâncias
-car::leveneTest(Comp_Medio ~ Gen*Colheita, data = produt_batata)
+# homoscedasticity of variances
+car::leveneTest(Comp_Medio ~ Gen*Colheita, data = produt_potato)
 
-# DIÂMETRO MÉDIO -- passou em tudo
-# normalidade dos resíduos
+# AVERAGE DIAMETER -- passou em tudo
+# normality of residuals
 shapiro.test(residuals(aov_diam))
-# homocedasticidade das variâncias
-car::leveneTest(Diam_Medio ~ Gen*Colheita, data = produt_batata)
+# homoscedasticity of variances
+car::leveneTest(Diam_Medio ~ Gen*Colheita, data = produt_potato)
 
-# N° DE FUROS -- não passou na normalidade
-# normalidade dos resíduos
+# NUMBER OF HOLLS -- não passou na normalidade
+# normality of residuals
 shapiro.test(residuals(aov_furos))
-# homocedasticidade das variâncias
-car::leveneTest(nFuros_Medio ~ Gen*Colheita, data = produt_batata)
+# homoscedasticity of variances
+car::leveneTest(nFuros_Medio ~ Gen*Colheita, data = produt_potato)
 
-# PESO COMERCIAL -- não passou na normalidade
-# normalidade dos resíduos
+# COMERCIAL WEIGTH -- não passou na normalidade
+# normality of residuals
 shapiro.test(residuals(aov_pesoCom))
-# homocedasticidade das variâncias
-car::leveneTest(peso_Comerc ~ Gen*Colheita, data = produt_batata)
+# homoscedasticity of variances
+car::leveneTest(peso_Comerc ~ Gen*Colheita, data = produt_potato)
 
-# PRODUTIVIDADE TOTAL -- não passou na normalidade
-# normalidade dos resíduos
+# TOTAL PRODUCTIVITY -- não passou na normalidade
+# normality of residuals
 shapiro.test(residuals(aov_prod))
-# homocedasticidade das variâncias
-car::leveneTest(Produtividade ~ Gen*Colheita, data = produt_batata)
+# homoscedasticity of variances
+car::leveneTest(Produtividade ~ Gen*Colheita, data = produt_potato)
 
-# PRODUTIVIDADE TOTAL TRANSFORMADA -- passou em tudo
+# TRANSFORMED TOTAL PRODUCTIVITY -- passou em tudo
 shapiro.test(residuals(aov_prod_T))
-car::leveneTest(Produtiv_T ~ Gen*Colheita, data = produt_batata)
+car::leveneTest(Produtiv_T ~ Gen*Colheita, data = produt_potato)
 
-# PESO COMERCIAL TRANSFORMADA -- passou em tudo
+# TRANSFORMED COMERCIAL WEIGTH -- passou em tudo
 shapiro.test(residuals(aov_pesoCom_T))
-car::leveneTest(Peso_Com_T ~ Gen*Colheita, data = produt_batata)
+car::leveneTest(Peso_Com_T ~ Gen*Colheita, data = produt_potato)
+
+
 
 
 # Comparações múltiplas ---------------------------------------------------
 
 
-# Teste de Diferenças Significativas de Tukey
-
-# Colheita de 120 dias
-HSD.test(y = aov_prod_120, trt = 'Gen', console = TRUE)
-
-# Colheita de 150 dias
-HSD.test(y = aov_prod_150, trt = 'Gen', console = TRUE)
-
-# Colheita de 180 dias
-HSD.test(y = aov_prod_180, trt = 'Gen', console = TRUE)
+# Scott-Knott Test
 
 
+#### 120-day Harvest ####
 
-# Teste de Scott-Knott
-
-
-#### Colheita de 120 dias ####
-
-# COMPRIMENTO
-capture.output(scottknott(y = batata120$Comp_Medio, trt = batata120$Gen,
+# AVERAGE LENGTH
+capture.output(scottknott(y = potato120$Comp_Medio, trt = potato120$Gen,
                           DFerror = aov_comp_120$df.residual,
                           SSerror = sum(aov_comp_120$residuals^2)),
                file = "Scott_Knott_Comp120.txt")
 
-# DIÂMETRO
-capture.output(scottknott(y = batata120$Diam_Medio, trt = batata120$Gen,
+# AVERAGE DIAMETER
+capture.output(scottknott(y = potato120$Diam_Medio, trt = potato120$Gen,
                           DFerror = aov_diam_120$df.residual,
                           SSerror = sum(aov_diam_120$residuals^2)),
                file = "Scott_Knott_Diam120.txt")
 
-# PESO COMERCIAL
-capture.output(scottknott(y = batata120$peso_Comerc, trt = batata120$Gen,
+# COMERCIAL WEIGTH
+capture.output(scottknott(y = potato120$peso_Comerc, trt = potato120$Gen,
                           DFerror = aov_pesoCom_120$df.residual,
                           SSerror = sum(aov_pesoCom_120$residuals^2)),
                file = "Scott_Knott_PesoCom120.txt")
 
-# PRODUTIVIDADE TOTAL
-capture.output(scottknott(y = batata120$Produtividade, trt = batata120$Gen,
+# TOTAL PRODUCTIVITY
+capture.output(scottknott(y = potato120$Produtividade, trt = potato120$Gen,
                           DFerror = aov_prod_120$df.residual,
                           SSerror = sum(aov_prod_120$residuals^2)),
                file = "Scott_Knott_Produt120.txt")
 
 
-#### Colheita de 150 dias ####
+#### 150-day Harvest ####
 
-# COMPRIMENTO
-capture.output(scottknott(y = batata150$Comp_Medio, trt = batata150$Gen,
+# AVERAGE LENGTH
+capture.output(scottknott(y = potato150$Comp_Medio, trt = potato150$Gen,
                           DFerror = aov_comp_150$df.residual,
                           SSerror = sum(aov_comp_150$residuals^2)),
                file = "Scott_Knott_Comp150.txt")
 
-# DIÂMETRO
-capture.output(scottknott(y = batata150$Diam_Medio, trt = batata150$Gen,
+# AVERAGE DIAMETER
+capture.output(scottknott(y = potato150$Diam_Medio, trt = potato150$Gen,
                           DFerror = aov_diam_150$df.residual,
                           SSerror = sum(aov_diam_150$residuals^2)),
                file = "Scott_Knott_Diam150.txt")
 
-# PESO COMERCIAL
-capture.output(scottknott(y = batata150$peso_Comerc, trt = batata150$Gen,
+# COMERCIAL WEIGTH
+capture.output(scottknott(y = potato150$peso_Comerc, trt = potato150$Gen,
                           DFerror = aov_pesoCom_150$df.residual,
                           SSerror = sum(aov_pesoCom_150$residuals^2)),
                file = "Scott_Knott_PesoCom150.txt")
 
-# PRODUTIVIDADE TOTAL
-capture.output(scottknott(y = batata150$Produtividade, trt = batata150$Gen,
+# TOTAL PRODUCTIVITY
+capture.output(scottknott(y = potato150$Produtividade, trt = potato150$Gen,
                           DFerror = aov_prod_150$df.residual,
                           SSerror = sum(aov_prod_150$residuals^2)),
                file = "Scott_Knott_Produt150.txt")
 
 
-#### Colheita de 180 dias ####
+#### 180-day Harvest ####
 
-# COMPRIMENTO
-capture.output(scottknott(y = batata180$Comp_Medio, trt = batata180$Gen,
+# AVERAGE LENGTH
+capture.output(scottknott(y = potato180$Comp_Medio, trt = potato180$Gen,
                           DFerror = aov_comp_180$df.residual,
                           SSerror = sum(aov_comp_180$residuals^2)),
                file = "Scott_Knott_Comp180.txt")
 
-# DIÂMETRO
-capture.output(scottknott(y = batata180$Diam_Medio, trt = batata180$Gen,
+# AVERAGE DIAMETER
+capture.output(scottknott(y = potato180$Diam_Medio, trt = potato180$Gen,
                           DFerror = aov_diam_180$df.residual,
                           SSerror = sum(aov_diam_180$residuals^2)),
                file = "Scott_Knott_Diam180.txt")
 
-# PESO COMERCIAL
-capture.output(scottknott(y = batata180$peso_Comerc, trt = batata180$Gen,
+# COMERCIAL WEIGTH
+capture.output(scottknott(y = potato180$peso_Comerc, trt = potato180$Gen,
                           DFerror = aov_pesoCom_180$df.residual,
                           SSerror = sum(aov_pesoCom_180$residuals^2)),
                file = "Scott_Knott_PesoCom180.txt")
 
-# PRODUTIVIDADE TOTAL
-capture.output(scottknott(y = batata180$Produtividade, trt = batata180$Gen,
+# TOTAL PRODUCTIVITY
+capture.output(scottknott(y = potato180$Produtividade, trt = potato180$Gen,
                           DFerror = aov_prod_180$df.residual,
                           SSerror = sum(aov_prod_180$residuals^2)),
                file = "Scott_Knott_Produt180.txt")
 
 
-#### As três Colheitas ####
+#### The Three Harvests ####
 
-# COMPRIMENTO
-capture.output(scottknott(y = produt_batata$Comp_Medio, trt = produt_batata$Gen,
+# AVERAGE LENGTH
+capture.output(scottknott(y = produt_potato$Comp_Medio, trt = produt_potato$Gen,
                           DFerror = aov_comp$df.residual,
                           SSerror = sum(aov_comp$residuals^2)),
                file = "Scott_Knott_Comp.txt")
 
-# DIÂMETRO
-capture.output(scottknott(y = produt_batata$Diam_Medio, trt = produt_batata$Gen,
+# AVERAGE DIAMETER
+capture.output(scottknott(y = produt_potato$Diam_Medio, trt = produt_potato$Gen,
                           DFerror = aov_diam$df.residual,
                           SSerror = sum(aov_diam$residuals^2)),
                file = "Scott_Knott_Diam.txt")
 
-# PESO COMERCIAL
-capture.output(scottknott(y = produt_batata$peso_Comerc, trt = produt_batata$Gen,
+# COMERCIAL WEIGTH
+capture.output(scottknott(y = produt_potato$peso_Comerc, trt = produt_potato$Gen,
                           DFerror = aov_pesoCom_T$df.residual,
                           SSerror = sum(aov_pesoCom_T$residuals^2)),
                file = "Scott_Knott_PesoComT.txt")
 
-# PRODUTIVIDADE TOTAL
-capture.output(scottknott(y = produt_batata$Produtividade, trt = produt_batata$Gen,
+# TOTAL PRODUCTIVITY
+capture.output(scottknott(y = produt_potato$Produtividade, trt = produt_potato$Gen,
                           DFerror = aov_prod_T$df.residual,
                           SSerror = sum(aov_prod_T$residuals^2)),
                file = "Scott_Knott_ProdutivT.txt")
 
 
-# PRODUTIVIDADE TOTAL NA COLHEITA DE 120 DIAS
-scottknott(y = produt_batata$Produtividade[produt_batata$Colheita == "120"],
-           trt = produt_batata$Gen[produt_batata$Colheita == "120"],
+# TOTAL PRODUCTIVITY NA 120-day
+scottknott(y = produt_potato$Produtividade[produt_potato$Colheita == "120"],
+           trt = produt_potato$Gen[produt_potato$Colheita == "120"],
            DFerror = aov_prod_T$df.residual,
            SSerror = sum(aov_prod_T$residuals^2))
