@@ -8,112 +8,7 @@
 source(file = "DescriptiveAnalysis.R")
 
 
-# ANOVA 120-day -------------------------------------------------------------------
-
-
-# ANOVA of Harvest Productivity as a Function of Genotypes
-aov_prod_120 <- aov(formula = Produtividade ~ Parcela+Gen, data = potato120)
-(summary_aov120 <- summary(aov_prod_120))
-# Exporting to a .txt file
-capture.output(summary_aov120, file = "teste_F_prod_120.txt")
-
-
-# Average Length ANOVA
-aov_comp_120 <- aov(formula = Comp_Medio ~ Parcela+Gen, data = potato120)
-(summary_aov120 <- summary(aov_comp_120))
-capture.output(summary_aov120, file = "teste_F_comp_120.txt")
-
-
-# Average Diameter ANOVA
-aov_diam_120 <- aov(formula = Diam_Medio ~ Parcela+Gen, data = potato120)
-(summary_aov120 <- summary(aov_diam_120))
-capture.output(summary_aov120, file = "teste_F_diam_120.txt")
-
-
-# Number os Holls ANOVA
-aov_furos_120 <- aov(formula = nFuros_Medio ~ Parcela+Gen, data = potato120)
-(summary_aov120 <- summary(aov_furos_120))
-capture.output(summary_aov120, file = "teste_F_nFuros_120.txt")
-
-
-# Comercial Weight ANOVA
-aov_pesoCom_120 <- aov(formula = peso_Comerc ~ Parcela+Gen, data = potato120)
-(summary_aov120 <- summary(aov_pesoCom_120))
-capture.output(summary_aov120, file = "teste_F_pesoCom_120.txt")
-
-
-
-
-# ANOVA 150-day --------------------------------------------
-
-
-# ANOVA of Harvest Productivity as a Function of Genotypes
-aov_prod_150 <- aov(formula = Produtividade ~ Parcela+Gen, data = potato150)
-(summary_aov150 <- summary(aov_prod_150))
-# Exporting to a .txt file
-capture.output(summary_aov150, file = "teste_F_prod_150.txt")
-
-
-# Average Length ANOVA
-aov_comp_150 <- aov(formula = Comp_Medio ~ Parcela+Gen, data = potato150)
-(summary_aov150 <- summary(aov_comp_150))
-capture.output(summary_aov150, file = "teste_F_comp_150.txt")
-
-
-# Average Diameter ANOVA
-aov_diam_150 <- aov(formula = Diam_Medio ~ Parcela+Gen, data = potato150)
-(summary_aov150 <- summary(aov_diam_150))
-capture.output(summary_aov150, file = "teste_F_diam_150.txt")
-
-
-# Number os Holls ANOVA
-aov_furos_150 <- aov(formula = nFuros_Medio ~ Parcela+Gen, data = potato150)
-(summary_aov150 <- summary(aov_furos_150))
-capture.output(summary_aov150, file = "teste_F_nFuros_150.txt")
-
-
-# Comercial Weight ANOVA
-aov_pesoCom_150 <- aov(formula = peso_Comerc ~ Parcela+Gen, data = potato150)
-(summary_aov150 <- summary(aov_pesoCom_150))
-capture.output(summary_aov150, file = "teste_F_pesoCom_150.txt")
-
-
-
-
-# ANOVA 180-day ----------------------------------------------------------
-
-
-# ANOVA of Harvest Productivity as a Function of Genotypes
-aov_prod_180 <- aov(formula = Produtividade ~ Parcela+Gen, data = potato180)
-(summary_aov180 <- summary(aov_prod_180))
-# Exporting to a .txt file
-capture.output(summary_aov180, file = "teste_F_prod_180.txt")
-
-
-# Average Length ANOVA
-aov_comp_180 <- aov(formula = Comp_Medio ~ Parcela+Gen, data = potato180)
-(summary_aov180 <- summary(aov_comp_180))
-capture.output(summary_aov180, file = "teste_F_comp_180.txt")
-
-
-# Average Diameter ANOVA
-aov_diam_180 <- aov(formula = Diam_Medio ~ Parcela+Gen, data = potato180)
-(summary_aov180 <- summary(aov_diam_180))
-capture.output(summary_aov180, file = "teste_F_diam_180.txt")
-
-
-# Number os Holls ANOVA
-aov_furos_180 <- aov(formula = nFuros_Medio ~ Parcela+Gen, data = potato180)
-(summary_aov180 <- summary(aov_furos_180))
-capture.output(summary_aov180, file = "teste_F_nFuros_180.txt")
-
-
-# Comercial Weight ANOVA
-aov_pesoCom_180 <- aov(formula = peso_Comerc ~ Parcela+Gen, data = potato180)
-(summary_aov180 <- summary(aov_pesoCom_180))
-capture.output(summary_aov180, file = "teste_F_pesoCom_180.txt")
-
-
+# Analysis of Variance ----------------------------------------------------
 
 
 # Two-Way ANOVA ---------------------------------------------------------
@@ -122,31 +17,31 @@ capture.output(summary_aov180, file = "teste_F_pesoCom_180.txt")
 aov_prod <- aov(formula = Produtividade ~ Parcela+Gen*Colheita, data = produt_potato)
 (summary_aov <- summary(aov_prod))
 # Exporting to a .txt file
-capture.output(summary_aov, file = "teste_F_prod.txt")
+capture.output(summary_aov, file = "ANOVA_prod.txt")
 
 
 # Average Length ANOVA
 aov_comp <- aov(formula = Comp_Medio ~ Parcela+Gen*Colheita, data = produt_potato)
 (summary_aov <- summary(aov_comp))
-capture.output(summary_aov, file = "teste_F_comp.txt")
+capture.output(summary_aov, file = "ANOVA_comp.txt")
 
 
 # Average Diameter ANOVA
 aov_diam <- aov(formula = Diam_Medio ~ Parcela+Gen*Colheita, data = produt_potato)
 (summary_aov <- summary(aov_diam))
-capture.output(summary_aov, file = "teste_F_diam.txt")
+capture.output(summary_aov, file = "ANOVA_diam.txt")
 
 
 # Number os Holls ANOVA
 aov_furos <- aov(formula = nFuros_Medio ~ Parcela+Gen*Colheita, data = produt_potato)
 (summary_aov <- summary(aov_furos))
-capture.output(summary_aov, file = "teste_F_nFuros.txt")
+capture.output(summary_aov, file = "ANOVA_nFuros.txt")
 
 
 # Comercial Weight ANOVA
 aov_pesoCom <- aov(formula = peso_Comerc ~ Parcela+Gen*Colheita, data = produt_potato)
 (summary_aov <- summary(aov_pesoCom))
-capture.output(summary_aov, file = "teste_F_pesoCom.txt")
+capture.output(summary_aov, file = "ANOVA_pesoCom.txt")
 
 
 # Transformed Productivity ANOVA
@@ -158,143 +53,28 @@ aov_pesoCom_T <- aov(formula = Peso_Com_T ~ Parcela+Gen*Colheita, data = produt_
 (summary_aov <- summary(aov_pesoCom_T))
 
 
-# ANOVA DO GENÓTIPO NA COLHEITA?
-aov_prod_Int <- aov(formula = Produtividade ~ Parcela + Colheita/Gen, data = produt_potato)
-summary(aov_prod_Int)
+# analisando o genótipo dentro da colheita
+aov_prod.1 <- aov(formula = Produtividade ~ Colheita/Gen, data = produt_potato)
+summary(aov_prod.1)
+names(coef(aov_prod.1))
+summary(aov_prod.1, split = list('Colheita:Gen' = list('Gen d. Colh 120'=c(1,4,7,10,13,16,19,22,25,28,31,34,37,40,43,46,49),
+                                                       'Gen d. Colh 150'=c(2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50),
+                                                       'Gen d. Colh 180'=c(3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51))))
 
+# analisando a colheita dentro do genótipo
+aov_prod.2 <- aov(formula = Produtividade ~ Gen/Colheita, data = produt_potato)
+summary(aov_prod.2)
+names(coef(aov_prod.2))
+summary(aov_prod.2, split = list('Gen:Colheita' = list('Colh d. Gen 1'=c(1,19),'Colh d. Gen 2'=c(2,20),'Colh d. Gen 3'=c(3,21),
+                                                       'Colh d. Gen 4'=c(4,22),'Colh d. Gen 5'=c(5,23),'Colh d. Gen 6'=c(6,24),
+                                                       'Colh d. Gen 7'=c(7,25),'Colh d. Gen 8'=c(8,26),'Colh d. Gen 9'=c(9,27),
+                                                       'Colh d. Gen 10'=c(10,28),'Colh d. Gen 11'=c(11,29),'Colh d. Gen 12'=c(12,30),
+                                                       'Colh d. Gen 13'=c(13,31),'Colh d. Gen 14'=c(14,32),'Colh d. Gen 15'=c(15,33),
+                                                       'Colh d. Gen 16'=c(16,34),'Colh d. Gen 17'=c(17,35),'Colh d. Gen 18'=c(18,36))))
 
 
 
 # Residuals Analysis -----------------------------------------------------
-
-
-#### 120-day Harvest ####
-
-# AVERAGE LENGTH -- passou na normalidade com transformação
-# normality of residuals
-shapiro.test(residuals(aov_comp_120))
-# homoscedasticity of variances
-car::leveneTest(Comp_Medio ~ Gen, data = potato120)
-# residuals independence
-lmtest::dwtest(Comp_Medio ~ Gen, data = potato120)
-
-# AVERAGE DIAMETER -- passou
-# normality of residuals
-shapiro.test(residuals(aov_diam_120))
-# homoscedasticity of variances
-car::leveneTest(Diam_Medio ~ Gen, data = potato120)
-# residuals independence
-lmtest::dwtest(Diam_Medio ~ Gen, data = potato120)
-
-# NUMBER OF HOLLS -- não passou na normalidade
-# normality of residuals
-shapiro.test(residuals(aov_furos_120))
-# homoscedasticity of variances
-car::leveneTest(nFuros_Medio ~ Gen, data = potato120)
-# residuals independence
-lmtest::dwtest(nFuros_Medio ~ Gen, data = potato120)
-
-# COMERCIAL WEIGTH -- passou
-# normality of residuals
-shapiro.test(residuals(aov_pesoCom_120))
-# homoscedasticity of variances
-car::leveneTest(peso_Comerc ~ Gen, data = potato120)
-# residuals independence
-lmtest::dwtest(peso_Comerc ~ Gen, data = potato120)
-
-# TOTAL PRODUCTIVITY -- passou
-# normality of residuals
-shapiro.test(residuals(aov_prod_120))
-# homoscedasticity of variances
-car::leveneTest(Produtividade ~ Gen, data = potato120)
-# residuals independence
-lmtest::dwtest(Produtividade ~ Gen, data = potato120)
-
-
-#### 150-day Harvest ####
-
-# AVERAGE LENGTH -- passou
-# normality of residuals
-shapiro.test(residuals(aov_comp_150))
-# homoscedasticity of variances
-car::leveneTest(Comp_Medio ~ Gen, data = potato150)
-# residuals independence
-lmtest::dwtest(Comp_Medio ~ Gen, data = potato150)
-
-# AVERAGE DIAMETER -- passou
-# normality of residuals
-shapiro.test(residuals(aov_diam_150))
-# homoscedasticity of variances
-car::leveneTest(Diam_Medio ~ Gen, data = potato150)
-# residuals independence
-lmtest::dwtest(Diam_Medio ~ Gen, data = potato150)
-
-# NUMBER OF HOLLS -- não passou na normalidade
-# normality of residuals
-shapiro.test(residuals(aov_furos_150))
-# homoscedasticity of variances
-car::leveneTest(nFuros_Medio ~ Gen, data = potato150)
-# residuals independence
-lmtest::dwtest(nFuros_Medio ~ Gen, data = potato150)
-
-# COMERCIAL WEIGTH -- passou
-# normality of residuals
-shapiro.test(residuals(aov_pesoCom_150))
-# homoscedasticity of variances
-car::leveneTest(peso_Comerc ~ Gen, data = potato150)
-# residuals independence
-lmtest::dwtest(peso_Comerc ~ Gen, data = potato150)
-
-# TOTAL PRODUCTIVITY -- passou
-# normality of residuals
-shapiro.test(residuals(aov_prod_150))
-# homoscedasticity of variances
-car::leveneTest(Produtividade ~ Gen, data = potato150)
-# residuals independence
-lmtest::dwtest(Produtividade ~ Gen, data = potato150)
-
-
-#### 180-day Harvest ####
-
-# AVERAGE LENGTH -- passou
-# normality of residuals
-shapiro.test(residuals(aov_comp_180))
-# homoscedasticity of variances
-car::leveneTest(Comp_Medio ~ Gen, data = potato180)
-# residuals independence
-lmtest::dwtest(Comp_Medio ~ Gen, data = potato180)
-
-# AVERAGE DIAMETER -- passou
-# normality of residuals
-shapiro.test(residuals(aov_diam_180))
-# homoscedasticity of variances
-car::leveneTest(Diam_Medio ~ Gen, data = potato180)
-# residuals independence
-lmtest::dwtest(Diam_Medio ~ Gen, data = potato180)
-
-# NUMBER OF HOLLS -- não passou na normalidade
-# normality of residuals
-shapiro.test(residuals(aov_furos_180))
-# homoscedasticity of variances
-car::leveneTest(nFuros_Medio ~ Gen, data = potato180)
-# residuals independence
-lmtest::dwtest(nFuros_Medio ~ Gen, data = potato180)
-
-# COMERCIAL WEIGTH -- passou
-# normality of residuals
-shapiro.test(residuals(aov_pesoCom_180))
-# homoscedasticity of variances
-car::leveneTest(peso_Comerc ~ Gen, data = potato180)
-# residuals independence
-lmtest::dwtest(peso_Comerc ~ Gen, data = potato180)
-
-# TOTAL PRODUCTIVITY -- passou
-# normality of residuals
-shapiro.test(residuals(aov_prod_180))
-# homoscedasticity of variances
-car::leveneTest(Produtividade ~ Gen, data = potato180)
-# residuals independence
-lmtest::dwtest(Produtividade ~ Gen, data = potato180)
 
 
 #### The Three Harvests ####
@@ -340,94 +120,184 @@ car::leveneTest(Peso_Com_T ~ Gen*Colheita, data = produt_potato)
 
 
 
-# Comparações múltiplas ---------------------------------------------------
+# Multiple Comparisons ---------------------------------------------------
 
 
-# Scott-Knott Test
+#### Tukey Test ####
 
 
-#### 120-day Harvest ####
+# teste de tukey para a colheita de 120 dias
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Colheita == '120'],
+                        trt = produt_potato$Gen[produt_potato$Colheita == '120'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Colh120.txt")
 
-# AVERAGE LENGTH
-capture.output(scottknott(y = potato120$Comp_Medio, trt = potato120$Gen,
-                          DFerror = aov_comp_120$df.residual,
-                          SSerror = sum(aov_comp_120$residuals^2)),
-               file = "Scott_Knott_Comp120.txt")
+# teste de tukey para a colheita de 150 dias
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Colheita == '150'],
+                        trt = produt_potato$Gen[produt_potato$Colheita == '150'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Colh150.txt")
 
-# AVERAGE DIAMETER
-capture.output(scottknott(y = potato120$Diam_Medio, trt = potato120$Gen,
-                          DFerror = aov_diam_120$df.residual,
-                          SSerror = sum(aov_diam_120$residuals^2)),
-               file = "Scott_Knott_Diam120.txt")
-
-# COMERCIAL WEIGTH
-capture.output(scottknott(y = potato120$peso_Comerc, trt = potato120$Gen,
-                          DFerror = aov_pesoCom_120$df.residual,
-                          SSerror = sum(aov_pesoCom_120$residuals^2)),
-               file = "Scott_Knott_PesoCom120.txt")
-
-# TOTAL PRODUCTIVITY
-capture.output(scottknott(y = potato120$Produtividade, trt = potato120$Gen,
-                          DFerror = aov_prod_120$df.residual,
-                          SSerror = sum(aov_prod_120$residuals^2)),
-               file = "Scott_Knott_Produt120.txt")
+# teste de tukey para a colheita de 180 dias
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Colheita == '180'],
+                        trt = produt_potato$Gen[produt_potato$Colheita == '180'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Colh180.txt")
 
 
-#### 150-day Harvest ####
+# teste de tukey para o genótipo 1
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '1'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '1'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen1.txt")
 
-# AVERAGE LENGTH
-capture.output(scottknott(y = potato150$Comp_Medio, trt = potato150$Gen,
-                          DFerror = aov_comp_150$df.residual,
-                          SSerror = sum(aov_comp_150$residuals^2)),
-               file = "Scott_Knott_Comp150.txt")
+# teste de tukey para o genótipo 2
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '2'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '2'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen2.txt")
 
-# AVERAGE DIAMETER
-capture.output(scottknott(y = potato150$Diam_Medio, trt = potato150$Gen,
-                          DFerror = aov_diam_150$df.residual,
-                          SSerror = sum(aov_diam_150$residuals^2)),
-               file = "Scott_Knott_Diam150.txt")
+# teste de tukey para o genótipo 3
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '3'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '3'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen3.txt")
 
-# COMERCIAL WEIGTH
-capture.output(scottknott(y = potato150$peso_Comerc, trt = potato150$Gen,
-                          DFerror = aov_pesoCom_150$df.residual,
-                          SSerror = sum(aov_pesoCom_150$residuals^2)),
-               file = "Scott_Knott_PesoCom150.txt")
+# teste de tukey para o genótipo 4
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '4'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '4'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen4.txt")
 
-# TOTAL PRODUCTIVITY
-capture.output(scottknott(y = potato150$Produtividade, trt = potato150$Gen,
-                          DFerror = aov_prod_150$df.residual,
-                          SSerror = sum(aov_prod_150$residuals^2)),
-               file = "Scott_Knott_Produt150.txt")
+# teste de tukey para o genótipo 5
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '5'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '5'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen5.txt")
+
+# teste de tukey para o genótipo 6
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '6'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '6'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen6.txt")
+
+# teste de tukey para o genótipo 7
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '7'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '7'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen7.txt")
+
+# teste de tukey para o genótipo 8
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '8'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '8'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen8.txt")
+
+# teste de tukey para o genótipo 9
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '9'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '9'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen9.txt")
+
+# teste de tukey para o genótipo 10
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '10'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '10'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen10.txt")
+
+# teste de tukey para o genótipo 11
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '11'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '1'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen11.txt")
+
+# teste de tukey para o genótipo 12
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '12'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '12'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen12.txt")
+
+# teste de tukey para o genótipo 13
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '13'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '13'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen13.txt")
+
+# teste de tukey para o genótipo 14
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '14'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '14'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen14.txt")
+
+# teste de tukey para o genótipo 15
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '15'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '15'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen15.txt")
+
+# teste de tukey para o genótipo 16
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '16'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '16'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen16.txt")
+
+# teste de tukey para o genótipo 17
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '17'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '17'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen17.txt")
+
+# teste de tukey para o genótipo 18
+capture.output(HSD.test(y = produt_potato$Produtividade[produt_potato$Gen == '18'],
+                        trt = produt_potato$Colheita[produt_potato$Gen == '18'],
+                        DFerror = aov_prod$df.residual,
+                        MSerror = summary(aov_prod)[[1]][5,3],
+                        console = TRUE),
+               file = "Tukey_Prod_Gen18.txt")
 
 
-#### 180-day Harvest ####
 
-# AVERAGE LENGTH
-capture.output(scottknott(y = potato180$Comp_Medio, trt = potato180$Gen,
-                          DFerror = aov_comp_180$df.residual,
-                          SSerror = sum(aov_comp_180$residuals^2)),
-               file = "Scott_Knott_Comp180.txt")
-
-# AVERAGE DIAMETER
-capture.output(scottknott(y = potato180$Diam_Medio, trt = potato180$Gen,
-                          DFerror = aov_diam_180$df.residual,
-                          SSerror = sum(aov_diam_180$residuals^2)),
-               file = "Scott_Knott_Diam180.txt")
-
-# COMERCIAL WEIGTH
-capture.output(scottknott(y = potato180$peso_Comerc, trt = potato180$Gen,
-                          DFerror = aov_pesoCom_180$df.residual,
-                          SSerror = sum(aov_pesoCom_180$residuals^2)),
-               file = "Scott_Knott_PesoCom180.txt")
-
-# TOTAL PRODUCTIVITY
-capture.output(scottknott(y = potato180$Produtividade, trt = potato180$Gen,
-                          DFerror = aov_prod_180$df.residual,
-                          SSerror = sum(aov_prod_180$residuals^2)),
-               file = "Scott_Knott_Produt180.txt")
-
-
-#### The Three Harvests ####
+#### Scott-Knott Test ####
 
 # AVERAGE LENGTH
 capture.output(scottknott(y = produt_potato$Comp_Medio, trt = produt_potato$Gen,
@@ -443,19 +313,208 @@ capture.output(scottknott(y = produt_potato$Diam_Medio, trt = produt_potato$Gen,
 
 # COMERCIAL WEIGTH
 capture.output(scottknott(y = produt_potato$peso_Comerc, trt = produt_potato$Gen,
-                          DFerror = aov_pesoCom_T$df.residual,
-                          SSerror = sum(aov_pesoCom_T$residuals^2)),
-               file = "Scott_Knott_PesoComT.txt")
+                          DFerror = aov_pesoCom$df.residual,
+                          SSerror = sum(aov_pesoCom$residuals^2)),
+               file = "Scott_Knott_PesoCom.txt")
 
 # TOTAL PRODUCTIVITY
 capture.output(scottknott(y = produt_potato$Produtividade, trt = produt_potato$Gen,
-                          DFerror = aov_prod_T$df.residual,
-                          SSerror = sum(aov_prod_T$residuals^2)),
-               file = "Scott_Knott_ProdutivT.txt")
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2)),
+               file = "Scott_Knott_Produtiv.txt")
 
 
-# TOTAL PRODUCTIVITY NA 120-day
-scottknott(y = produt_potato$Produtividade[produt_potato$Colheita == "120"],
-           trt = produt_potato$Gen[produt_potato$Colheita == "120"],
-           DFerror = aov_prod_T$df.residual,
-           SSerror = sum(aov_prod_T$residuals^2))
+
+# teste de scott-knot para a colheita de 120 dias
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Colheita == '120'],
+                          trt = produt_potato$Gen[produt_potato$Colheita == '120'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para Colheita de 120 dias'),
+               file = "SK_Produt_colh120.txt")
+
+# teste de scott-knot para a colheita de 150 dias
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Colheita == '150'],
+                          trt = produt_potato$Gen[produt_potato$Colheita == '150'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para Colheita de 120 dias'),
+               file = "SK_Produt_colh150.txt")
+
+# teste de scott-knot para a colheita de 180 dias
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Colheita == '180'],
+                          trt = produt_potato$Gen[produt_potato$Colheita == '180'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott paraa Colheita de 180 dias'),
+               file = "SK_Produt_colh180.txt")
+
+
+# teste de scott-knot para o genótipo 1
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '1'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '1'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 1'),
+               file = "SK_Produt_Gen1.txt")
+
+# teste de scott-knot para o genótipo 2
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '2'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '2'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 2'),
+               file = "SK_Produt_Gen2.txt")
+
+# teste de scott-knot para o genótipo 3
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '3'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '3'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 3'),
+               file = "SK_Produt_Gen3.txt")
+
+# teste de scott-knot para o genótipo 4
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '4'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '4'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 4'),
+               file = "SK_Produt_Gen4.txt")
+
+# teste de scott-knot para o genótipo 5
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '5'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '5'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 5'),
+               file = "SK_Produt_Gen5.txt")
+
+# teste de scott-knot para o genótipo 6
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '6'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '6'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 6'),
+               file = "SK_Produt_Gen6.txt")
+
+# teste de scott-knot para o genótipo 7
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '7'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '7'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 7'),
+               file = "SK_Produt_Gen7.txt")
+
+# teste de scott-knot para o genótipo 8
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '8'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '8'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 8'),
+               file = "SK_Produt_Gen8.txt")
+
+# teste de scott-knot para o genótipo 9
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '9'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '9'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 9'),
+               file = "SK_Produt_Gen9.txt")
+
+# teste de scott-knot para o genótipo 10
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '10'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '10'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 10'),
+               file = "SK_Produt_Gen10.txt")
+
+# teste de scott-knot para o genótipo 11
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '11'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '1'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 11'),
+               file = "SK_Produt_Gen11.txt")
+
+# teste de scott-knot para o genótipo 12
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '12'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '12'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 12'),
+               file = "SK_Produt_Gen12.txt")
+
+# teste de scott-knot para o genótipo 13
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '13'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '13'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 13'),
+               file = "SK_Produt_Gen13.txt")
+
+# teste de scott-knot para o genótipo 14
+capture.output(scottknott(y = produt_potato$Produtividade[produt_potato$Gen == '14'],
+                          trt = produt_potato$Colheita[produt_potato$Gen == '14'],
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 14'),
+               file = "SK_Produt_Gen14.txt")
+
+# teste de scott-knot para o genótipo 15
+
+# Filtrando os dados para remover NAs
+dados_filtrados <- produt_potato[produt_potato$Gen == '15' & 
+                                   !is.na(produt_potato$Produtividade) & 
+                                   !is.na(produt_potato$Colheita), ]
+
+capture.output(scottknott(y = dados_filtrados$Produtividade,
+                          trt = dados_filtrados$Colheita,
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 15'),
+               file = "SK_Produt_Gen15.txt")
+
+# teste de scott-knot para o genótipo 16
+
+# Filtrando os dados para remover NAs
+dados_filtrados <- produt_potato[produt_potato$Gen == '16' & 
+                                   !is.na(produt_potato$Produtividade) & 
+                                   !is.na(produt_potato$Colheita), ]
+
+capture.output(scottknott(y = dados_filtrados$Produtividade,
+                          trt = dados_filtrados$Colheita,
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 16'),
+               file = "SK_Produt_Gen16.txt")
+
+# teste de scott-knot para o genótipo 17
+
+# Filtrando os dados para remover NAs
+dados_filtrados <- produt_potato[produt_potato$Gen == '17' & 
+                                   !is.na(produt_potato$Produtividade) & 
+                                   !is.na(produt_potato$Colheita), ]
+
+capture.output(scottknott(y = dados_filtrados$Produtividade,
+                          trt = dados_filtrados$Colheita,
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 17'),
+               file = "SK_Produt_Gen17.txt")
+
+# teste de scott-knot para o genótipo 18
+
+# Filtrando os dados para remover NAs
+dados_filtrados <- produt_potato[produt_potato$Gen == '18' & 
+                                   !is.na(produt_potato$Produtividade) & 
+                                   !is.na(produt_potato$Colheita), ]
+
+capture.output(scottknott(y = dados_filtrados$Produtividade,
+               trt = dados_filtrados$Colheita,
+                          DFerror = aov_prod$df.residual,
+                          SSerror = sum(aov_prod$residuals^2),
+                          main = 'Teste de Scott-Knott para o Genótipo 18'),
+               file = "SK_Produt_Gen18.txt")
+

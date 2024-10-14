@@ -128,7 +128,8 @@ produt_potato <- produt_potato %>%
          Produtiv_T = sqrt(Produtividade+0.0001),
          Peso_Com_T = sqrt(peso_Comerc+0.0001),
          Comp_T = sqrt(Comp_Medio+0.0001),
-         n_Fur_T = sqrt(nFuros_Medio+0.0001))
+         n_Fur_T = sqrt(nFuros_Medio+0.0001),
+         Gen = factor(Gen, levels = 1:18))
 
 
 ## treatments in the climate dataset
