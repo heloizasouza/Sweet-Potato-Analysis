@@ -86,9 +86,6 @@ graphics <- list()
          title = "N° de Furos Médio dos genótipos colhidos em 120, 150 e 180 dias")
 )
 
-
-##### Climate Graphs #####
-
 # BarPlot of Productivity of all genotypes in the three harvests
 (graphics[[9]] <- ggplot(data = produt_potato, mapping = aes(x = Gen, y = Produtividade, fill = Parcela)) +
     geom_col() + facet_grid(rows = vars(Colheita)) +
@@ -100,7 +97,7 @@ graphics <- list()
 )
 
 # DotPlot of Productivity of all genotypes in the three harvests
-(graphics[[10]] <- ggplot(data = produt_potato, mapping = aes(x = Gen, y = Produtividade, colour = Parcela)) + 
+(graphics[[10]] <- ggplot(data = produt_potato, mapping = aes(x = Gen, y = Produtividade)) + 
     geom_point() + facet_grid(rows = vars(Colheita)) +
     scale_x_discrete(limits = as.character(1:18)) +
     theme_light() +
@@ -217,7 +214,40 @@ graphics <- list()
          x = "Data", y = "UR med (%)")
 )
 
+# Commercial Weight of all genotypes in the three harvests
+(graphics[[17]] <- ggplot(data = produt_potato, mapping = aes(x = Gen, y = peso_Comerc)) + 
+    geom_point() + facet_grid(rows = vars(Colheita)) +
+    scale_x_discrete(limits = as.character(1:18)) +
+    theme_light() +
+    labs(x = 'Genótipo', y = "Peso Comercial",
+         title = "Peso Comercial dos genótipos colhidos em 120, 150 e 180 dias")
+)
 
+# Average Length of all genotypes in the three harvests
+(graphics[[18]] <- ggplot(data = produt_potato, mapping = aes(x = Gen, y = Comp_Medio)) + 
+    geom_point() + facet_grid(rows = vars(Colheita)) +
+    scale_x_discrete(limits = as.character(1:18)) +
+    theme_light() +
+    labs(x = 'Genótipo', y = "Comprimento Médio",
+         title = "Comprimento Médio dos genótipos colhidos em 120, 150 e 180 dias"))
+
+# Average Diameter of all genotypes in the three harvests
+(graphics[[19]] <- ggplot(data = produt_potato, mapping = aes(x = Gen, y = Diam_Medio)) + 
+    geom_point() + facet_grid(rows = vars(Colheita)) +
+    scale_x_discrete(limits = as.character(1:18)) +
+    theme_light() +
+    labs(x = 'Genótipo', y = "Diâmetro Médio",
+         title = "Diâmetro Médio dos genótipos colhidos em 120, 150 e 180 dias")
+)
+
+# average number of holes of all genotypes in the three harvests
+(graphics[[20]] <- ggplot(data = produt_potato, mapping = aes(x = Gen, y = nFuros_Medio)) + 
+    geom_point() + facet_grid(rows = vars(Colheita)) +
+    scale_x_discrete(limits = as.character(1:18)) +
+    theme_light() +
+    labs(x = 'Genótipo', y = "N° de Furos Médio",
+         title = "N° de Furos Médio dos genótipos colhidos em 120, 150 e 180 dias")
+)
 
 
 
@@ -226,5 +256,6 @@ graphics <- list()
 
 # exporting the graphics
 for (i in 1:length(graphics)) {
-  ggsave(filename = paste0("grafico_", i, ".png"), plot = graphics[[i]], width = 6, height = 4)
+  ggsave(filename = paste0("grafico_", i, ".png"), plot = graphics[[i]],
+         path = "C:/Users/00100712290/Desktop/HELOIZA/KATLYN_PLOTS")
 }

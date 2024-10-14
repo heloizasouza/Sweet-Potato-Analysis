@@ -17,7 +17,7 @@ compraria <- sensorial_filled %>%
   filter(compraria == 1) %>%  # Filtrar apenas quem respondeu "Sim"
   group_by(Gênero, faixa_etaria, genótipo) %>%
   summarise(total_compraria = n(), .groups = 'drop') %>%
-  arrange(Gênero, faixa_etaria, desc(total_compraria))
+  arrange(Gênero, faixa_etaria, genótipo, desc(total_compraria))
 
 
 # gráfico da Contagem de Compras por Espécie de Batata Doce
