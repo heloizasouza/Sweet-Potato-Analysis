@@ -57,21 +57,22 @@ aov_pesoCom_T <- aov(formula = Peso_Com_T ~ Parcela+Gen*Colheita, data = produt_
 aov_prod.1 <- aov(formula = Produtividade ~ Colheita/Gen, data = produt_potato)
 summary(aov_prod.1)
 names(coef(aov_prod.1))
-summary(aov_prod.1, split = list('Colheita:Gen' = list('Gen d. Colh 120'=c(1,4,7,10,13,16,19,22,25,28,31,34,37,40,43,46,49),
-                                                       'Gen d. Colh 150'=c(2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50),
-                                                       'Gen d. Colh 180'=c(3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51))))
+(summary_aov <- summary(aov_prod.1, split = list('Colheita:Gen' = list('Gen d. Colh 120'=c(1,4,7,10,13,16,19,22,25,28,31,34,37,40,43,46,49),
+                                                                      'Gen d. Colh 150'=c(2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50),
+                                                                      'Gen d. Colh 180'=c(3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51)))))
+capture.output(summary_aov, file = "ANOVA_Colheita-d-Gen.txt")
 
 # analisando a colheita dentro do genótipo
 aov_prod.2 <- aov(formula = Produtividade ~ Gen/Colheita, data = produt_potato)
 summary(aov_prod.2)
 names(coef(aov_prod.2))
-summary(aov_prod.2, split = list('Gen:Colheita' = list('Colh d. Gen 1'=c(1,19),'Colh d. Gen 2'=c(2,20),'Colh d. Gen 3'=c(3,21),
-                                                       'Colh d. Gen 4'=c(4,22),'Colh d. Gen 5'=c(5,23),'Colh d. Gen 6'=c(6,24),
-                                                       'Colh d. Gen 7'=c(7,25),'Colh d. Gen 8'=c(8,26),'Colh d. Gen 9'=c(9,27),
-                                                       'Colh d. Gen 10'=c(10,28),'Colh d. Gen 11'=c(11,29),'Colh d. Gen 12'=c(12,30),
-                                                       'Colh d. Gen 13'=c(13,31),'Colh d. Gen 14'=c(14,32),'Colh d. Gen 15'=c(15,33),
-                                                       'Colh d. Gen 16'=c(16,34),'Colh d. Gen 17'=c(17,35),'Colh d. Gen 18'=c(18,36))))
-
+(summary_aov <- summary(aov_prod.2, split = list('Gen:Colheita' = list('Colh d. Gen 1'=c(1,19),'Colh d. Gen 2'=c(2,20),'Colh d. Gen 3'=c(3,21),
+                                                                       'Colh d. Gen 4'=c(4,22),'Colh d. Gen 5'=c(5,23),'Colh d. Gen 6'=c(6,24),
+                                                                       'Colh d. Gen 7'=c(7,25),'Colh d. Gen 8'=c(8,26),'Colh d. Gen 9'=c(9,27),
+                                                                       'Colh d. Gen 10'=c(10,28),'Colh d. Gen 11'=c(11,29),'Colh d. Gen 12'=c(12,30),
+                                                                       'Colh d. Gen 13'=c(13,31),'Colh d. Gen 14'=c(14,32),'Colh d. Gen 15'=c(15,33),
+                                                                       'Colh d. Gen 16'=c(16,34),'Colh d. Gen 17'=c(17,35),'Colh d. Gen 18'=c(18,36)))))
+capture.output(summary_aov, file = "ANOVA_Gen-d-Colheita.txt")
 
 
 # Residuals Analysis -----------------------------------------------------
@@ -97,13 +98,13 @@ shapiro.test(residuals(aov_furos))
 # homoscedasticity of variances
 car::leveneTest(nFuros_Medio ~ Gen*Colheita, data = produt_potato)
 
-# COMERCIAL WEIGTH -- não passou na normalidade
+# COMERCIAL WEIGTH -- passou na normalidade pra alpha=0.01
 # normality of residuals
 shapiro.test(residuals(aov_pesoCom))
 # homoscedasticity of variances
 car::leveneTest(peso_Comerc ~ Gen*Colheita, data = produt_potato)
 
-# TOTAL PRODUCTIVITY -- não passou na normalidade
+# TOTAL PRODUCTIVITY -- passou na normalidade pra alpha=0.01
 # normality of residuals
 shapiro.test(residuals(aov_prod))
 # homoscedasticity of variances
